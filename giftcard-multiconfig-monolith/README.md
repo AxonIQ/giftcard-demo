@@ -6,6 +6,6 @@ separation between business logic and infrastructure.
 
 Dependent on the activated profile, this application can run:
 * Fully on an embedded H2 database
-* On 2 separate Postgres database
+* On 2 separate Postgres databases
 * On a combination of Postgres and AxonIQ's AxonDB
 
