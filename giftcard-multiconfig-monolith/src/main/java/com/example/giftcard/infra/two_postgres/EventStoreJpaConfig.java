@@ -13,6 +13,7 @@ import org.axonframework.eventsourcing.eventstore.jpa.DomainEventEntry;
 import org.axonframework.eventsourcing.eventstore.jpa.JpaEventStorageEngine;
 import org.axonframework.eventsourcing.eventstore.jpa.SQLErrorCodesResolver;
 import org.axonframework.eventsourcing.eventstore.jpa.SnapshotEventEntry;
+import org.axonframework.messaging.interceptors.CorrelationDataInterceptor;
 import org.axonframework.monitoring.NoOpMessageMonitor;
 import org.axonframework.serialization.Serializer;
 import org.axonframework.serialization.upcasting.event.EventUpcaster;
@@ -158,8 +159,10 @@ public class EventStoreJpaConfig {
     }
 
     @Bean
-    public CommandBus commandBus(@Qualifier("events") TransactionManager transactionManager) {
-        return new SimpleCommandBus(transactionManager, NoOpMessageMonitor.INSTANCE);
+    public CommandBus commandBus(@Qualifier("events") TransactionManager transactionManager, AxonConfiguration axonConfiguration) {
+        SimpleCommandBus commandBus = new SimpleCommandBus(transactionManager, NoOpMessageMonitor.INSTANCE);
+        commandBus.registerHandlerInterceptor(new CorrelationDataInterceptor<>(axonConfiguration.correlationDataProviders()));
+        return commandBus;
     }
 
     @Bean
