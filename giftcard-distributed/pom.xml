@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.example</groupId>
+	<artifactId>giftcard-distributed</artifactId>
+	<version>1.0</version>
+	<packaging>pom</packaging>
+
+	<name>giftcard-distributed</name>
+	<description>Axon Framework demo project, distributed using the AxonIQ platform</description>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.10.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+		<axon.version>3.1.3</axon.version>
+		<kotlin.version>1.2.21</kotlin.version>
+		<axonhub.version>1.0-beta3</axonhub.version>
+		<vaadin.version>8.2.0</vaadin.version>
+	</properties>
+
+	<modules>
+		<module>gc-common</module>
+		<module>gc-command</module>
+		<module>gc-query</module>
+		<module>gc-gui</module>
+	</modules>
+
+</project>
