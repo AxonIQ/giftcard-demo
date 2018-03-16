@@ -14,11 +14,4 @@ public class GcQueryApp {
 		SpringApplication.run(GcQueryApp.class, args);
 	}
 
-	/* Using tracking processors. */
-	@Autowired
-	public void configure(EventHandlingConfiguration configuration) {
-		configuration.usingTrackingProcessors(
-				c -> TrackingEventProcessorConfiguration.forParallelProcessing(4),
-				c -> new SequentialPerAggregatePolicy());
-	}
 }

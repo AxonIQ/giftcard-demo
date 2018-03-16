@@ -45,10 +45,10 @@
 			<version>${axonhub.version}</version>
 		</dependency>
 
-		<!-- Embedded database H2  -->
+		<!-- Embedded database Derby -->
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
