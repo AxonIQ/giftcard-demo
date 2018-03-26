@@ -26,6 +26,8 @@
 		<kotlin.version>1.2.21</kotlin.version>
 		<axonhub.version>1.0-beta3</axonhub.version>
 		<vaadin.version>8.2.0</vaadin.version>
+        <springfox.version>2.7.0</springfox.version>
+        <swagger.version>1.5.17</swagger.version>
 	</properties>
 
 	<modules>
@@ -33,6 +35,7 @@
 		<module>gc-command</module>
 		<module>gc-query</module>
 		<module>gc-gui</module>
-	</modules>
+        <module>gc-endurancetest</module>
+    </modules>
 
 </project>

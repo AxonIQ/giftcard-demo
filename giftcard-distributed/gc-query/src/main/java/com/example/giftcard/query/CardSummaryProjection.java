@@ -1,6 +1,13 @@
 package com.example.giftcard.query;
 
-import com.example.giftcard.api.*;
+import com.example.giftcard.api.CanceledEvt;
+import com.example.giftcard.api.CardSummary;
+import com.example.giftcard.api.CountCardSummariesQuery;
+import com.example.giftcard.api.CountCardSummariesResponse;
+import com.example.giftcard.api.FindCardSummariesQuery;
+import com.example.giftcard.api.FindCardSummariesResponse;
+import com.example.giftcard.api.IssuedEvt;
+import com.example.giftcard.api.RedeemedEvt;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.eventhandling.Timestamp;
 import org.axonframework.queryhandling.QueryHandler;
@@ -8,10 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import java.lang.invoke.MethodHandles;
 import java.time.Instant;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 @Component
 public class CardSummaryProjection {
@@ -37,11 +44,18 @@ public class CardSummaryProjection {
         summary.setRemainingValue(summary.getRemainingValue() - evt.getAmount());
     }
 
+    @EventHandler
+    public void on(CanceledEvt evt) {
+        log.debug("projecting {}", evt);
+        CardSummary cardSummary = entityManager.find(CardSummary.class, evt.getId());
+        entityManager.remove(cardSummary);
+    }
+
     @QueryHandler
     public FindCardSummariesResponse handle(FindCardSummariesQuery query) {
         log.debug("handling {}", query);
         Query jpaQuery = entityManager.createQuery("SELECT c FROM CardSummary c ORDER BY c.id",
-                CardSummary.class);
+                                                   CardSummary.class);
         jpaQuery.setFirstResult(query.getOffset());
         jpaQuery.setMaxResults(query.getLimit());
         FindCardSummariesResponse response = new FindCardSummariesResponse(jpaQuery.getResultList());
@@ -53,9 +67,9 @@ public class CardSummaryProjection {
     public CountCardSummariesResponse handle(CountCardSummariesQuery query) {
         log.debug("handling {}", query);
         Query jpaQuery = entityManager.createQuery("SELECT COUNT(c) FROM CardSummary c",
-                Long.class);
+                                                   Long.class);
         CountCardSummariesResponse response = new CountCardSummariesResponse(
-                ((Long)jpaQuery.getSingleResult()).intValue());
+                ((Long) jpaQuery.getSingleResult()).intValue());
         log.debug("returning {}", response);
         return response;
     }

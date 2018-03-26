@@ -1,11 +1,14 @@
 package com.example.giftcard.command;
 
+import com.example.giftcard.api.CancelCmd;
+import com.example.giftcard.api.CanceledEvt;
 import com.example.giftcard.api.IssueCmd;
 import com.example.giftcard.api.IssuedEvt;
 import com.example.giftcard.api.RedeemCmd;
 import com.example.giftcard.api.RedeemedEvt;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.commandhandling.model.AggregateIdentifier;
+import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.spring.stereotype.Aggregate;
 import org.slf4j.Logger;
@@ -14,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 import static org.axonframework.commandhandling.model.AggregateLifecycle.apply;
+import static org.axonframework.commandhandling.model.AggregateLifecycle.markDeleted;
 
 @Aggregate
 public class GiftCard {
@@ -43,6 +47,12 @@ public class GiftCard {
         apply(new RedeemedEvt(id, cmd.getAmount()));
     }
 
+    @CommandHandler
+    public void handle(CancelCmd cmd) {
+        log.debug("handling {}", cmd);
+        apply(new CanceledEvt(id));
+    }
+
     @EventSourcingHandler
     public void on(IssuedEvt evt) {
         log.debug("applying {}", evt);
@@ -56,6 +66,12 @@ public class GiftCard {
         log.debug("applying {}", evt);
         remainingValue -= evt.getAmount();
         log.debug("new remaining value: {}", remainingValue);
+    }
+
+    @EventHandler
+    public void on(CanceledEvt evt) {
+        log.debug("applying {}", evt);
+        markDeleted(); // TODO: 3/26/2018 check whether this makes sense
     }
 
 }
