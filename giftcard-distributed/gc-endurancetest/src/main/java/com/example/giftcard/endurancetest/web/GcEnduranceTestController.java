@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Milan Savic
  */
-@RestController
+@RestController("/api")
 public class GcEnduranceTestController {
 
     private final GcEnduranceTest gcEnduranceTest;

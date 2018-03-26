@@ -29,12 +29,12 @@ public class GcEnduranceTest {
 
     private final CommandGateway commandGateway;
     private ScheduledExecutorService scheduledExecutorService;
-    private final AtomicLong counter;
+    private final EnduranceTestInfo enduranceTestInfo;
 
     public GcEnduranceTest(CommandGateway commandGateway) {
         this.commandGateway = commandGateway;
         scheduledExecutorService = createScheduledExecutorService();
-        counter = new AtomicLong();
+        enduranceTestInfo = new EnduranceTestInfo();
     }
 
     public synchronized void start(int parallelism, int maxDelay, TimeUnit unit) {
@@ -46,7 +46,6 @@ public class GcEnduranceTest {
             LOGGER.info("Scheduler is terminated, starting new one...");
             scheduledExecutorService = createScheduledExecutorService();
         }
-        counter.set(0L);
         for (int i = 0; i < parallelism; i++) {
             scheduledExecutorService.schedule(() -> performTestCase(maxDelay, unit),
                                               rand(maxDelay),
@@ -57,6 +56,7 @@ public class GcEnduranceTest {
     public synchronized void stop() {
         LOGGER.info("Stopping execution of endurance test.");
         shutDown();
+        enduranceTestInfo.reset();
         LOGGER.info("Endurance test stopped.");
     }
 
@@ -67,10 +67,13 @@ public class GcEnduranceTest {
         LOGGER.info("Scheduler is shut down.");
     }
 
+    public EnduranceTestInfo getInfo() {
+        return enduranceTestInfo;
+    }
+
     private void performTestCase(int maxDelay, TimeUnit unit) {
         String id = UUID.randomUUID().toString();
-        long currentCount = counter.incrementAndGet();
-        LOGGER.info("Executing test case #{} with id: {}.", currentCount, id);
+        LOGGER.info("Executing test case #{} with id: {}.", enduranceTestInfo.commandStarted(), id);
         try {
             commandGateway.sendAndWait(new IssueCmd(id, 100));
             for (int i = 0; i < 10; i++) {
@@ -80,6 +83,7 @@ public class GcEnduranceTest {
         } catch (Exception e) {
             // we don't want to stop endurance test if one test case failed
             LOGGER.error(format("Unexpected error occurred during performing a test case with id: %s.", id), e);
+            enduranceTestInfo.commandFailed();
         }
         scheduledExecutorService.schedule(() -> performTestCase(maxDelay, unit),
                                           rand(maxDelay),
