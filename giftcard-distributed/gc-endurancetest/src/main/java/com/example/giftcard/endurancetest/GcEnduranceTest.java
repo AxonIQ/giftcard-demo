@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -21,7 +22,7 @@ import javax.annotation.PreDestroy;
 @Component
 public class GcEnduranceTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GcEnduranceTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final CommandGateway commandGateway;
     private ScheduledExecutorService scheduledExecutorService;
@@ -70,7 +71,7 @@ public class GcEnduranceTest {
         try {
             commandGateway.sendAndWait(new IssueCmd(id, 100));
             for (int i = 0; i < 10; i++) {
-                commandGateway.sendAndWait(new RedeemCmd(id, 100));
+                commandGateway.sendAndWait(new RedeemCmd(id, 9));
             }
             commandGateway.sendAndWait(new CancelCmd(id));
         } catch (Exception e) {
