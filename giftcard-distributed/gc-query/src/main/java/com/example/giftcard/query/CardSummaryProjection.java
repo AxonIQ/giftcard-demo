@@ -47,7 +47,7 @@ public class CardSummaryProjection {
     @EventHandler
     public void on(CanceledEvt evt) {
         log.debug("projecting {}", evt);
-        CardSummary cardSummary = entityManager.find(CardSummary.class, evt.getId());
+        CardSummary cardSummary = entityManager.getReference(CardSummary.class, evt.getId());
         entityManager.remove(cardSummary);
     }
 
