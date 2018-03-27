@@ -42,19 +42,25 @@ public class GcEnduranceTest {
         enduranceTestInfo = new EnduranceTestInfoImpl();
     }
 
-    public synchronized void start(int parallelism, int maxDelay, TimeUnit unit) {
-        LOGGER.info("Started execution of endurance test. Parameters: parallelism {}, maxDelay {}, unit {}.",
+    public void start(int parallelism, int maxDelayInMillis, int duration, TimeUnit durationTimeUnit) {
+        start(parallelism, maxDelayInMillis);
+        LOGGER.info("Duration of the test: {} {}.", duration, durationTimeUnit);
+        scheduledExecutorService.schedule(this::stop, duration, durationTimeUnit);
+    }
+
+    public synchronized void start(int parallelism, int maxDelayInMillis) {
+        LOGGER.info("Started execution of endurance test. Parameters: parallelism {}, maxDelayInMillis {}, unit {}.",
                     parallelism,
-                    maxDelay,
-                    unit);
+                    maxDelayInMillis,
+                    TimeUnit.MILLISECONDS);
         if (scheduledExecutorService.isTerminated()) {
             LOGGER.info("Scheduler is terminated, starting new one...");
             scheduledExecutorService = createScheduledExecutorService();
         }
         for (int i = 0; i < parallelism; i++) {
-            scheduledExecutorService.schedule(() -> performTestCase(maxDelay, unit),
-                                              rand(maxDelay),
-                                              unit);
+            scheduledExecutorService.schedule(() -> performTestCase(maxDelayInMillis),
+                                              rand(maxDelayInMillis),
+                                              TimeUnit.MILLISECONDS);
         }
     }
 
@@ -69,7 +75,7 @@ public class GcEnduranceTest {
         return enduranceTestInfo;
     }
 
-    private void performTestCase(int maxDelay, TimeUnit unit) {
+    private void performTestCase(int maxDelayInMillis) {
         String id = UUID.randomUUID().toString();
         LOGGER.info("Executing test case #{} with id: {}.", enduranceTestInfo.testCaseStarted(), id);
 
@@ -86,9 +92,9 @@ public class GcEnduranceTest {
             enduranceTestInfo.exception(e);
         }
 
-        scheduledExecutorService.schedule(() -> performTestCase(maxDelay, unit),
-                                          rand(maxDelay),
-                                          unit);
+        scheduledExecutorService.schedule(() -> performTestCase(maxDelayInMillis),
+                                          rand(maxDelayInMillis),
+                                          TimeUnit.MILLISECONDS);
     }
 
     private int rand(int max) {

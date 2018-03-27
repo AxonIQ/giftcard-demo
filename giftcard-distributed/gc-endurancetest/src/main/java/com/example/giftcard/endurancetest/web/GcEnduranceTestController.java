@@ -19,8 +19,13 @@ public class GcEnduranceTestController {
     }
 
     @GetMapping("/start")
-    public void start(int parallelism, int maxDelayInMilis) {
-        gcEnduranceTest.start(parallelism, maxDelayInMilis, TimeUnit.MILLISECONDS);
+    public void start(int parallelism, int maxDelayInMillis) {
+        gcEnduranceTest.start(parallelism, maxDelayInMillis);
+    }
+
+    @GetMapping("/startWithTimeLimit")
+    public void start(int parallelism, int maxDelayInMillis, int duration, TimeUnit durationTimeUnit) {
+        gcEnduranceTest.start(parallelism, maxDelayInMillis, duration, durationTimeUnit);
     }
 
     @GetMapping("/stop")
