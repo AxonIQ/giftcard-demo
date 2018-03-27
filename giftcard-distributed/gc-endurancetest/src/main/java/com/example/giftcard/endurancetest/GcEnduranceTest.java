@@ -23,12 +23,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
 
 import static java.lang.String.format;
 
 /**
+ * Performs endurance test. Test case consists of sending an {@link IssueCmd}, 10 {@link RedeemCmd}s and a {@link
+ * CancelCmd}. All commands are sent one after another with random delay (maxDelay is provided at {@link
+ * GcEnduranceTest#start}). After test case completes, new one is scheduled with random delay. It is also possible to
+ * define duration of the test. At any time, test can be stopped using {@link GcEnduranceTest#stop()}.
+ *
  * @author Milan Savic
  */
 @Component
@@ -40,18 +44,37 @@ public class GcEnduranceTest {
     private ScheduledExecutorService scheduledExecutorService;
     private final EnduranceTestInfoImpl enduranceTestInfo;
 
+    /**
+     * Instantiates the endurance test.
+     *
+     * @param commandGateway used for sending the commands
+     */
     public GcEnduranceTest(CommandGateway commandGateway) {
         this.commandGateway = commandGateway;
         scheduledExecutorService = createScheduledExecutorService();
         enduranceTestInfo = new EnduranceTestInfoImpl();
     }
 
+    /**
+     * Starts the test execution.
+     *
+     * @param parallelism      maximum of parallel executions of test cases
+     * @param maxDelayInMillis maximum delay between test case steps (and test cases)
+     * @param duration         for how long test will run
+     * @param durationTimeUnit time unit of duration
+     */
     public void start(int parallelism, int maxDelayInMillis, int duration, TimeUnit durationTimeUnit) {
         start(parallelism, maxDelayInMillis);
         LOGGER.info("Duration of the test: {} {}.", duration, durationTimeUnit);
         scheduledExecutorService.schedule(this::stop, duration, durationTimeUnit);
     }
 
+    /**
+     * Starts the test execution.
+     *
+     * @param parallelism      maximum of parallel executions of test cases
+     * @param maxDelayInMillis maximum delay between test case steps (and test cases)
+     */
     public synchronized void start(int parallelism, int maxDelayInMillis) {
         LOGGER.info("Started execution of endurance test. Parameters: parallelism {}, maxDelayInMillis {}, unit {}.",
                     parallelism,
@@ -68,6 +91,9 @@ public class GcEnduranceTest {
         }
     }
 
+    /**
+     * Stops the test execution - no new commands and test cases will be scheduled.
+     */
     @PreDestroy
     public synchronized void stop() {
         LOGGER.info("Stopping execution of endurance test.");
@@ -75,6 +101,11 @@ public class GcEnduranceTest {
         LOGGER.info("Endurance test stopped.");
     }
 
+    /**
+     * Gets the information about the test execution process.
+     *
+     * @return information about the test execution process
+     */
     public EnduranceTestInfo getInfo() {
         return enduranceTestInfo;
     }
@@ -97,10 +128,7 @@ public class GcEnduranceTest {
                                          new CancelCmd(id));
 
         TestCase testCase = new TestCase(id,
-                                         commandGateway,
-                                         scheduledExecutorService,
                                          maxDelayInMillis,
-                                         enduranceTestInfo,
                                          () -> scheduledExecutorService
                                                  .schedule(() -> performTestCase(maxDelayInMillis),
                                                            rand(maxDelayInMillis),
@@ -121,29 +149,19 @@ public class GcEnduranceTest {
 
         private final String id;
         private final Queue<?> commands;
-        private final CommandGateway commandGateway;
-        private final ScheduledExecutorService scheduledExecutorService;
         private final int maxDelayInMillis;
-        private final EnduranceTestInfoImpl enduranceTestInfo;
         private final Runnable onDone;
 
-        private TestCase(String id, CommandGateway commandGateway,
-                         ScheduledExecutorService scheduledExecutorService,
-                         int maxDelayInMillis,
-                         EnduranceTestInfoImpl enduranceTestInfo,
-                         Runnable onDone, List<?> commands) {
+        private TestCase(String id, int maxDelayInMillis, Runnable onDone, List<?> commands) {
             this.id = id;
-            this.commandGateway = commandGateway;
-            this.scheduledExecutorService = scheduledExecutorService;
             this.maxDelayInMillis = maxDelayInMillis;
-            this.enduranceTestInfo = enduranceTestInfo;
             this.onDone = onDone;
             this.commands = Lists.newLinkedList(commands);
         }
 
         private void process() {
             if (commands.isEmpty()) {
-                onDone.run();
+                done();
                 return;
             }
 
@@ -155,6 +173,13 @@ public class GcEnduranceTest {
             } catch (Exception e) {
                 LOGGER.error(format("Unexpected error occurred during processing test case with id: %s", id), e);
                 enduranceTestInfo.exception(e);
+                done();
+            }
+        }
+
+        private void done() {
+            if (onDone != null) {
+                onDone.run();
             }
         }
     }

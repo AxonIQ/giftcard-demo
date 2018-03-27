@@ -2,7 +2,6 @@ package com.example.giftcard.endurancetest.web;
 
 import com.example.giftcard.endurancetest.EnduranceTestInfo;
 import com.example.giftcard.endurancetest.GcEnduranceTest;
-import com.google.common.collect.Lists;
 import com.vaadin.annotations.Push;
 import com.vaadin.data.HasValue;
 import com.vaadin.server.VaadinRequest;
@@ -25,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
+ * UI for the endurance test where is possible to start/stop the test and check information about progress.
+ *
  * @author Milan Savic
  */
 @SpringUI
@@ -34,6 +35,11 @@ public class GcEnduranceTestUI extends UI {
     private final GcEnduranceTest gcEnduranceTest;
     private final ScheduledExecutorService scheduledExecutorService;
 
+    /**
+     * Instantiates UI with reference to the endurance test.
+     *
+     * @param gcEnduranceTest endurance test
+     */
     public GcEnduranceTestUI(GcEnduranceTest gcEnduranceTest) {
         this.gcEnduranceTest = gcEnduranceTest;
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
