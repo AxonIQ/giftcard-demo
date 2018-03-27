@@ -1,5 +1,6 @@
 package com.example.giftcard.endurancetest;
 
+import com.example.giftcard.api.CancelCmd;
 import com.example.giftcard.api.IssueCmd;
 import com.example.giftcard.api.RedeemCmd;
 import com.google.common.collect.Lists;
@@ -82,7 +83,18 @@ public class GcEnduranceTest {
         String id = UUID.randomUUID().toString();
         LOGGER.info("Executing test case #{} with id: {}.", enduranceTestInfo.testCaseStarted(), id);
 
-        List<?> commands = Arrays.asList(new IssueCmd(id, 100), new RedeemCmd(id, 9));
+        List<?> commands = Arrays.asList(new IssueCmd(id, 100),
+                                         new RedeemCmd(id, 9),
+                                         new RedeemCmd(id, 9),
+                                         new RedeemCmd(id, 9),
+                                         new RedeemCmd(id, 9),
+                                         new RedeemCmd(id, 9),
+                                         new RedeemCmd(id, 9),
+                                         new RedeemCmd(id, 9),
+                                         new RedeemCmd(id, 9),
+                                         new RedeemCmd(id, 9),
+                                         new RedeemCmd(id, 9),
+                                         new CancelCmd(id));
 
         TestCase testCase = new TestCase(id,
                                          commandGateway,
@@ -119,14 +131,14 @@ public class GcEnduranceTest {
                          ScheduledExecutorService scheduledExecutorService,
                          int maxDelayInMillis,
                          EnduranceTestInfoImpl enduranceTestInfo,
-                         Runnable onDone, Object... commands) {
+                         Runnable onDone, List<?> commands) {
             this.id = id;
             this.commandGateway = commandGateway;
             this.scheduledExecutorService = scheduledExecutorService;
             this.maxDelayInMillis = maxDelayInMillis;
             this.enduranceTestInfo = enduranceTestInfo;
             this.onDone = onDone;
-            this.commands = Lists.newLinkedList(Arrays.stream(commands).collect(Collectors.toList()));
+            this.commands = Lists.newLinkedList(commands);
         }
 
         private void process() {
