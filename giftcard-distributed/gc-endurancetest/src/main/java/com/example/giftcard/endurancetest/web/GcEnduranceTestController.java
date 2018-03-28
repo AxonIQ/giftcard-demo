@@ -1,5 +1,6 @@
 package com.example.giftcard.endurancetest.web;
 
+import com.codahale.metrics.MetricRegistry;
 import com.example.giftcard.endurancetest.GcEnduranceTest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,18 +12,22 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Milan Savic
  */
-@RestController("/api")
+@RestController
 public class GcEnduranceTestController {
 
     private final GcEnduranceTest gcEnduranceTest;
+    private final MetricRegistry metricRegistry;
 
     /**
      * Instantiates the controller with the reference to the endurance test.
      *
      * @param gcEnduranceTest endurance test
+     * @param metricRegistry  contains information about test metrics
      */
-    public GcEnduranceTestController(GcEnduranceTest gcEnduranceTest) {
+    public GcEnduranceTestController(GcEnduranceTest gcEnduranceTest,
+                                     MetricRegistry metricRegistry) {
         this.gcEnduranceTest = gcEnduranceTest;
+        this.metricRegistry = metricRegistry;
     }
 
     /**
@@ -55,5 +60,15 @@ public class GcEnduranceTestController {
     @GetMapping("/stop")
     public void stop() {
         gcEnduranceTest.stop();
+    }
+
+    /**
+     * Gets metrics regarding test execution.
+     *
+     * @return metrics regarding execution
+     */
+    @GetMapping("/metrics")
+    public MetricRegistry getMetrics() {
+        return metricRegistry;
     }
 }

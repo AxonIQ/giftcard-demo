@@ -1,5 +1,6 @@
 package com.example.giftcard.endurancetest;
 
+import com.codahale.metrics.MetricRegistry;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -8,6 +9,8 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
+ * Entry point to the application.
+ *
  * @author Milan Savic
  */
 @SpringBootApplication
@@ -21,5 +24,10 @@ public class GcEnduranceTestApp {
     @Bean
     public Docket swagger() {
         return new Docket(DocumentationType.SWAGGER_2).select().build();
+    }
+
+    @Bean
+    public MetricRegistry metrics() {
+        return new MetricRegistry();
     }
 }

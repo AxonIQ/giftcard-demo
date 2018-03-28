@@ -28,6 +28,7 @@
 		<vaadin.version>8.2.0</vaadin.version>
         <springfox.version>2.7.0</springfox.version>
         <swagger.version>1.5.17</swagger.version>
+        <dropwizard.version>4.0.2</dropwizard.version>
 	</properties>
 
 	<modules>

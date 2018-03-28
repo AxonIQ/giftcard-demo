@@ -1,5 +1,7 @@
 package com.example.giftcard.endurancetest;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 import com.example.giftcard.api.CancelCmd;
 import com.example.giftcard.api.IssueCmd;
 import com.example.giftcard.api.RedeemCmd;
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.lang.invoke.MethodHandles;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -22,9 +25,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.PreDestroy;
 
+import static com.codahale.metrics.MetricRegistry.name;
 import static java.lang.String.format;
 
 /**
@@ -48,11 +51,12 @@ public class GcEnduranceTest {
      * Instantiates the endurance test.
      *
      * @param commandGateway used for sending the commands
+     * @param metrics        metrics registry used to track test metrics
      */
-    public GcEnduranceTest(CommandGateway commandGateway) {
+    public GcEnduranceTest(CommandGateway commandGateway, MetricRegistry metrics) {
         this.commandGateway = commandGateway;
         scheduledExecutorService = createScheduledExecutorService();
-        enduranceTestInfo = new EnduranceTestInfoImpl();
+        enduranceTestInfo = new EnduranceTestInfoImpl(metrics);
     }
 
     /**
@@ -76,6 +80,7 @@ public class GcEnduranceTest {
      * @param maxDelayInMillis maximum delay between test case steps (and test cases)
      */
     public synchronized void start(int parallelism, int maxDelayInMillis) {
+        enduranceTestInfo.testStarted();
         LOGGER.info("Started execution of endurance test. Parameters: parallelism {}, maxDelayInMillis {}, unit {}.",
                     parallelism,
                     maxDelayInMillis,
@@ -219,38 +224,44 @@ public class GcEnduranceTest {
 
         private static final int EXCEPTIONS_THRESHOLD = 1000;
 
-        private final AtomicLong startedTestCases;
-        private final AtomicLong successfulCommands;
-        private final AtomicLong numberOfFailedCommands;
+        private final Meter startedTestCases;
+        private final Meter successfulCommands;
+        private final Meter numberOfFailedCommands;
         private final CopyOnWriteArrayList<FailedCommandInfo<?>> failedCommands;
-        private final CopyOnWriteArrayList<Throwable> exceptions;
+        private final CopyOnWriteArrayList<ExceptionInfo> exceptions;
+        private long testStartTime;
 
-        private EnduranceTestInfoImpl() {
-            this.startedTestCases = new AtomicLong();
-            this.successfulCommands = new AtomicLong();
-            this.numberOfFailedCommands = new AtomicLong();
-            this.failedCommands = new CopyOnWriteArrayList<>();
-            this.exceptions = new CopyOnWriteArrayList<>();
+        private EnduranceTestInfoImpl(MetricRegistry metrics) {
+            startedTestCases = metrics.meter(name(EnduranceTestInfo.class, "started-test-cases-meter"));
+            successfulCommands = metrics.meter(name(EnduranceTestInfo.class, "successful-commands-meter"));
+            numberOfFailedCommands = metrics.meter(name(EnduranceTestInfo.class, "failed-commands-meter"));
+            failedCommands = new CopyOnWriteArrayList<>();
+            exceptions = new CopyOnWriteArrayList<>();
+        }
+
+        private void testStarted() {
+            testStartTime = System.currentTimeMillis();
         }
 
         private long testCaseStarted() {
-            return startedTestCases.incrementAndGet();
+            startedTestCases.mark();
+            return startedTestCases.getCount();
         }
 
         private void commandFailed(CommandMessage<?> command, Throwable cause) {
-            numberOfFailedCommands.incrementAndGet();
-            failedCommands.add(new FailedCommandInfo<>(command, cause));
+            numberOfFailedCommands.mark();
+            failedCommands.add(new FailedCommandInfo<>(OffsetDateTime.now(), command, cause));
             if (failedCommands.size() + exceptions.size() > EXCEPTIONS_THRESHOLD) {
                 failedCommands.remove(0);
             }
         }
 
         private void commandSucceeded() {
-            successfulCommands.incrementAndGet();
+            successfulCommands.mark();
         }
 
         private void exception(Throwable t) {
-            exceptions.add(t);
+            exceptions.add(new ExceptionInfo(OffsetDateTime.now(), t));
             if (failedCommands.size() + exceptions.size() > EXCEPTIONS_THRESHOLD) {
                 exceptions.remove(0);
             }
@@ -258,12 +269,17 @@ public class GcEnduranceTest {
 
         @Override
         public long getStartedTestCases() {
-            return startedTestCases.get();
+            return startedTestCases.getCount();
         }
 
         @Override
         public long getSuccessfulCommands() {
-            return successfulCommands.get();
+            return successfulCommands.getCount();
+        }
+
+        @Override
+        public double getSuccessfulCommandsOneMinuteRate() {
+            return successfulCommands.getOneMinuteRate();
         }
 
         @Override
@@ -273,12 +289,25 @@ public class GcEnduranceTest {
 
         @Override
         public long getNumberOfFailedCommands() {
-            return numberOfFailedCommands.get();
+            return numberOfFailedCommands.getCount();
         }
 
         @Override
-        public List<Throwable> getExceptions() {
+        public double getNumberOfFailedCommandsOneMinuteRate() {
+            return numberOfFailedCommands.getOneMinuteRate();
+        }
+
+        @Override
+        public List<ExceptionInfo> getExceptions() {
             return Collections.unmodifiableList(exceptions);
+        }
+
+        @Override
+        public long getTestDuration() {
+            if (testStartTime == 0) {
+                return 0;
+            }
+            return System.currentTimeMillis() - testStartTime;
         }
     }
 }

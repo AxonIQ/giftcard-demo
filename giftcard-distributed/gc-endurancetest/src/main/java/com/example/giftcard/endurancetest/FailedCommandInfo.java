@@ -2,25 +2,27 @@ package com.example.giftcard.endurancetest;
 
 import org.axonframework.commandhandling.CommandMessage;
 
+import java.time.OffsetDateTime;
+
 /**
  * Information about failed command.
  *
  * @author Milan Savic
  */
-public class FailedCommandInfo<T> {
+public class FailedCommandInfo<T> extends ExceptionInfo {
 
     private final CommandMessage<T> command;
-    private final Throwable cause;
 
     /**
      * Instantiates failed command info with command message which failed ant the cause why it failed.
      *
-     * @param command the command which failed
-     * @param cause   the cause why command failed
+     * @param timestamp the timestamp when command failed
+     * @param command   the command which failed
+     * @param cause     the cause why command failed
      */
-    public FailedCommandInfo(CommandMessage<T> command, Throwable cause) {
+    public FailedCommandInfo(OffsetDateTime timestamp, CommandMessage<T> command, Throwable cause) {
+        super(timestamp, cause);
         this.command = command;
-        this.cause = cause;
     }
 
     /**
@@ -32,12 +34,8 @@ public class FailedCommandInfo<T> {
         return command;
     }
 
-    /**
-     * Gets the cause why command failed.
-     *
-     * @return the cause why command failed
-     */
-    public Throwable getCause() {
-        return cause;
+    @Override
+    public String toString() {
+        return getTimestamp() + ": " + getCommand().getCommandName() + " -> " + getCause().getMessage();
     }
 }

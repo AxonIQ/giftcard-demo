@@ -24,6 +24,13 @@ public interface EnduranceTestInfo {
     long getSuccessfulCommands();
 
     /**
+     * Gets one minute rate of successful commands.
+     *
+     * @return one minute rate of successful commands
+     */
+    double getSuccessfulCommandsOneMinuteRate();
+
+    /**
      * Information about failed commands. These are limited to 1000 together with exceptions.
      *
      * @return information about failed commands
@@ -38,9 +45,23 @@ public interface EnduranceTestInfo {
     long getNumberOfFailedCommands();
 
     /**
+     * Gets one minute rate of failed commands.
+     *
+     * @return one minute rate of failed commands
+     */
+    double getNumberOfFailedCommandsOneMinuteRate();
+
+    /**
      * List of exceptions which occurred during test execution. These are limited to 1000 together with failed commands.
      *
      * @return list of exceptions
      */
-    List<Throwable> getExceptions();
+    List<ExceptionInfo> getExceptions();
+
+    /**
+     * Gets current test duration in millis.
+     *
+     * @return current test duration in millis
+     */
+    long getTestDuration();
 }

@@ -1,6 +1,7 @@
 package com.example.giftcard.endurancetest.web;
 
 import com.example.giftcard.endurancetest.EnduranceTestInfo;
+import com.example.giftcard.endurancetest.ExceptionInfo;
 import com.example.giftcard.endurancetest.GcEnduranceTest;
 import com.vaadin.annotations.Push;
 import com.vaadin.data.HasValue;
@@ -18,10 +19,15 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.lang.String.format;
 
 /**
  * UI for the endurance test where is possible to start/stop the test and check information about progress.
@@ -100,36 +106,50 @@ public class GcEnduranceTestUI extends UI {
     private Panel infoPanel() {
         TextField startedTestCases = new TextField("Started test cases");
         TextField successfulCommands = new TextField("Successful commands");
+        TextField successfulCommandsOneMinuteRate = new TextField("Successful commands (1 minute rate)");
         TextField failedCommands = new TextField("Failed commands");
-        TextArea exceptionsArea = new TextArea("Exceptions");
-        startedTestCases.setReadOnly(false);
-        successfulCommands.setReadOnly(false);
-        failedCommands.setReadOnly(false);
-        exceptionsArea.setWordWrap(true);
-        exceptionsArea.setReadOnly(true);
-        exceptionsArea.setRows(20);
-        exceptionsArea.setWidth(100, Unit.PERCENTAGE);
+        TextField failedCommandsOneMinuteRate = new TextField("Failed commands (1 minute rate)");
+        TextField testDuration = new TextField("Test duration");
+        TextArea errorsArea = new TextArea("Errors");
+        startedTestCases.setReadOnly(true);
+        successfulCommands.setReadOnly(true);
+        successfulCommandsOneMinuteRate.setReadOnly(true);
+        failedCommands.setReadOnly(true);
+        failedCommandsOneMinuteRate.setReadOnly(true);
+        testDuration.setReadOnly(true);
+        errorsArea.setWordWrap(true);
+        errorsArea.setReadOnly(true);
+        errorsArea.setRows(20);
+        errorsArea.setWidth(100, Unit.PERCENTAGE);
 
         scheduledExecutorService.scheduleWithFixedDelay(() -> access(() -> {
             EnduranceTestInfo enduranceTestInfo = gcEnduranceTest.getInfo();
             startedTestCases.setValue("" + enduranceTestInfo.getStartedTestCases());
             successfulCommands.setValue("" + enduranceTestInfo.getSuccessfulCommands());
+            successfulCommandsOneMinuteRate.setValue("" + enduranceTestInfo.getSuccessfulCommandsOneMinuteRate());
             failedCommands.setValue("" + enduranceTestInfo.getNumberOfFailedCommands());
-            String exceptions = enduranceTestInfo.getFailedCommands().stream()
-                                                 .map(failedCommandInfo ->
-                                                              failedCommandInfo.getCommand().getCommandName()
-                                                                      + " -> " + failedCommandInfo.getCause()
-                                                                                                  .getMessage())
-                                                 .collect(Collectors.joining("\n"));
+            failedCommandsOneMinuteRate.setValue("" + enduranceTestInfo.getNumberOfFailedCommandsOneMinuteRate());
 
-            exceptions += "\n" + enduranceTestInfo.getExceptions().stream()
-                                                  .map(Throwable::getMessage)
-                                                  .collect(Collectors.joining("\n"));
-            exceptionsArea.setValue(exceptions.trim());
+            String exceptions = Stream.of(enduranceTestInfo.getFailedCommands(), enduranceTestInfo.getExceptions())
+                                      .flatMap(List::stream)
+                                      .sorted(Comparator.comparing(ExceptionInfo::getTimestamp))
+                                      .map(Object::toString)
+                                      .collect(Collectors.joining("\n"));
+            errorsArea.setValue(exceptions.trim());
+
+            long testDurationValue = enduranceTestInfo.getTestDuration();
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(testDurationValue);
+            long seconds = TimeUnit.MILLISECONDS.toSeconds(testDurationValue) - TimeUnit.MINUTES.toSeconds(minutes);
+            testDuration.setValue(format("%02dm : %02ds", minutes, seconds));
         }), 0, 2, TimeUnit.SECONDS);
 
-        VerticalLayout basicInfo = new VerticalLayout(startedTestCases, successfulCommands, failedCommands);
-        HorizontalLayout layout = new HorizontalLayout(basicInfo, exceptionsArea);
+        VerticalLayout basicInfo = new VerticalLayout(startedTestCases,
+                                                      successfulCommands,
+                                                      successfulCommandsOneMinuteRate,
+                                                      failedCommands,
+                                                      failedCommandsOneMinuteRate,
+                                                      testDuration);
+        HorizontalLayout layout = new HorizontalLayout(basicInfo, errorsArea);
         layout.setWidth(600, Unit.PIXELS);
         layout.setMargin(true);
         Panel panel = new Panel("Info panel");
