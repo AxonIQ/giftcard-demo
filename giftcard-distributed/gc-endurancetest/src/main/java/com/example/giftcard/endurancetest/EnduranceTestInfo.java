@@ -24,14 +24,21 @@ public interface EnduranceTestInfo {
     long getSuccessfulCommands();
 
     /**
-     * Information about failed commands.
+     * Information about failed commands. These are limited to 1000 together with exceptions.
      *
      * @return information about failed commands
      */
     List<FailedCommandInfo<?>> getFailedCommands();
 
     /**
-     * List of exceptions which occurred during test execution.
+     * Gets total number of failed commands.
+     *
+     * @return number of failed commands
+     */
+    long getNumberOfFailedCommands();
+
+    /**
+     * List of exceptions which occurred during test execution. These are limited to 1000 together with failed commands.
      *
      * @return list of exceptions
      */

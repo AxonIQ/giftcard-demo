@@ -114,7 +114,7 @@ public class GcEnduranceTestUI extends UI {
             EnduranceTestInfo enduranceTestInfo = gcEnduranceTest.getInfo();
             startedTestCases.setValue("" + enduranceTestInfo.getStartedTestCases());
             successfulCommands.setValue("" + enduranceTestInfo.getSuccessfulCommands());
-            failedCommands.setValue("" + enduranceTestInfo.getFailedCommands().size());
+            failedCommands.setValue("" + enduranceTestInfo.getNumberOfFailedCommands());
             String exceptions = enduranceTestInfo.getFailedCommands().stream()
                                                  .map(failedCommandInfo ->
                                                               failedCommandInfo.getCommand().getCommandName()

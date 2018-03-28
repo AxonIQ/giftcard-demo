@@ -221,12 +221,14 @@ public class GcEnduranceTest {
 
         private final AtomicLong startedTestCases;
         private final AtomicLong successfulCommands;
+        private final AtomicLong numberOfFailedCommands;
         private final CopyOnWriteArrayList<FailedCommandInfo<?>> failedCommands;
         private final CopyOnWriteArrayList<Throwable> exceptions;
 
         private EnduranceTestInfoImpl() {
             this.startedTestCases = new AtomicLong();
             this.successfulCommands = new AtomicLong();
+            this.numberOfFailedCommands = new AtomicLong();
             this.failedCommands = new CopyOnWriteArrayList<>();
             this.exceptions = new CopyOnWriteArrayList<>();
         }
@@ -236,6 +238,7 @@ public class GcEnduranceTest {
         }
 
         private void commandFailed(CommandMessage<?> command, Throwable cause) {
+            numberOfFailedCommands.incrementAndGet();
             failedCommands.add(new FailedCommandInfo<>(command, cause));
             if (failedCommands.size() + exceptions.size() > EXCEPTIONS_THRESHOLD) {
                 failedCommands.remove(0);
@@ -266,6 +269,11 @@ public class GcEnduranceTest {
         @Override
         public List<FailedCommandInfo<?>> getFailedCommands() {
             return Collections.unmodifiableList(failedCommands);
+        }
+
+        @Override
+        public long getNumberOfFailedCommands() {
+            return numberOfFailedCommands.get();
         }
 
         @Override
