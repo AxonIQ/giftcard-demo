@@ -135,7 +135,7 @@ public class GcEnduranceTestUI extends UI {
             failedCommands.setValue("" + enduranceTestInfo.getNumberOfFailedCommands());
             failedCommandsOneMinuteRate.setValue(
                     "" + BigDecimal.valueOf(enduranceTestInfo.getNumberOfFailedCommandsOneMinuteRate())
-                                   .setScale(2, RoundingMode.CEILING));
+                                   .setScale(2, RoundingMode.HALF_UP));
 
             String exceptions = Stream.of(enduranceTestInfo.getFailedCommands(), enduranceTestInfo.getExceptions())
                                       .flatMap(List::stream)
