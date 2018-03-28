@@ -103,6 +103,12 @@ public class GcEnduranceTest {
     public synchronized void stop() {
         LOGGER.info("Stopping execution of endurance test.");
         scheduledExecutorService.shutdown();
+        try {
+            scheduledExecutorService.awaitTermination(1, TimeUnit.MINUTES);
+            enduranceTestInfo.testStopped();
+        } catch (InterruptedException e) {
+            LOGGER.warn("An error occurred during test stopping.", e);
+        }
         LOGGER.info("Endurance test stopped.");
     }
 
@@ -230,6 +236,8 @@ public class GcEnduranceTest {
         private final CopyOnWriteArrayList<FailedCommandInfo<?>> failedCommands;
         private final CopyOnWriteArrayList<ExceptionInfo> exceptions;
         private long testStartTime;
+        private long testEndTime;
+        private boolean running = false;
 
         private EnduranceTestInfoImpl(MetricRegistry metrics) {
             startedTestCases = metrics.meter(name(EnduranceTestInfo.class, "started-test-cases-meter"));
@@ -240,7 +248,13 @@ public class GcEnduranceTest {
         }
 
         private void testStarted() {
+            running = true;
             testStartTime = System.currentTimeMillis();
+        }
+
+        private void testStopped() {
+            running = false;
+            testEndTime = System.currentTimeMillis();
         }
 
         private long testCaseStarted() {
@@ -304,8 +318,8 @@ public class GcEnduranceTest {
 
         @Override
         public long getTestDuration() {
-            if (testStartTime == 0) {
-                return 0;
+            if (!running) {
+                return testEndTime - testStartTime;
             }
             return System.currentTimeMillis() - testStartTime;
         }

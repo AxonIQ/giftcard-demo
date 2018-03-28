@@ -18,6 +18,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -106,9 +108,9 @@ public class GcEnduranceTestUI extends UI {
     private Panel infoPanel() {
         TextField startedTestCases = new TextField("Started test cases");
         TextField successfulCommands = new TextField("Successful commands");
-        TextField successfulCommandsOneMinuteRate = new TextField("Successful commands (1 minute rate)");
+        TextField successfulCommandsOneMinuteRate = new TextField("Successful commands (1 minute rate / s)");
         TextField failedCommands = new TextField("Failed commands");
-        TextField failedCommandsOneMinuteRate = new TextField("Failed commands (1 minute rate)");
+        TextField failedCommandsOneMinuteRate = new TextField("Failed commands (1 minute rate / s)");
         TextField testDuration = new TextField("Test duration");
         TextArea errorsArea = new TextArea("Errors");
         startedTestCases.setReadOnly(true);
@@ -126,9 +128,14 @@ public class GcEnduranceTestUI extends UI {
             EnduranceTestInfo enduranceTestInfo = gcEnduranceTest.getInfo();
             startedTestCases.setValue("" + enduranceTestInfo.getStartedTestCases());
             successfulCommands.setValue("" + enduranceTestInfo.getSuccessfulCommands());
-            successfulCommandsOneMinuteRate.setValue("" + enduranceTestInfo.getSuccessfulCommandsOneMinuteRate());
+
+            successfulCommandsOneMinuteRate.setValue(
+                    "" + BigDecimal.valueOf(enduranceTestInfo.getSuccessfulCommandsOneMinuteRate())
+                                   .setScale(2, RoundingMode.CEILING));
             failedCommands.setValue("" + enduranceTestInfo.getNumberOfFailedCommands());
-            failedCommandsOneMinuteRate.setValue("" + enduranceTestInfo.getNumberOfFailedCommandsOneMinuteRate());
+            failedCommandsOneMinuteRate.setValue(
+                    "" + BigDecimal.valueOf(enduranceTestInfo.getNumberOfFailedCommandsOneMinuteRate())
+                                   .setScale(2, RoundingMode.CEILING));
 
             String exceptions = Stream.of(enduranceTestInfo.getFailedCommands(), enduranceTestInfo.getExceptions())
                                       .flatMap(List::stream)
