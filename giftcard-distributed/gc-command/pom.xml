@@ -15,7 +15,6 @@
         <groupId>com.example</groupId>
         <artifactId>giftcard-distributed</artifactId>
         <version>1.0</version>
-		<relativePath />
     </parent>
 
 	<dependencies>
