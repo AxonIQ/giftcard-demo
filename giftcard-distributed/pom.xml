@@ -24,7 +24,7 @@
 		<java.version>1.8</java.version>
 		<axon.version>3.2</axon.version>
 		<kotlin.version>1.2.21</kotlin.version>
-		<axonhub.version>1.0-RC1</axonhub.version>
+		<axonhub.version>1.0.3</axonhub.version>
 		<vaadin.version>8.2.0</vaadin.version>
 	</properties>
 

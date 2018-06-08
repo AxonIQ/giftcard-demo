@@ -1,5 +1,7 @@
 package com.example.giftcard.command;
 
+import com.example.giftcard.api.CancelCmd;
+import com.example.giftcard.api.CancelEvt;
 import com.example.giftcard.api.IssueCmd;
 import com.example.giftcard.api.IssuedEvt;
 import com.example.giftcard.api.RedeemCmd;
@@ -42,12 +44,24 @@ public class GiftCard {
         if(cmd.getAmount() > remainingValue) throw new IllegalStateException("amount > remaining value");
         apply(new RedeemedEvt(id, cmd.getAmount()));
     }
+    @CommandHandler
+    public void handle(CancelCmd cmd) {
+        log.debug("handling {}", cmd);
+        apply(new CancelEvt(id));
+    }
 
     @EventSourcingHandler
     public void on(IssuedEvt evt) {
         log.debug("applying {}", evt);
         id = evt.getId();
         remainingValue = evt.getAmount();
+        log.debug("new remaining value: {}", remainingValue);
+    }
+
+    @EventSourcingHandler
+    public void on(CancelEvt evt) {
+        log.debug("applying {}", evt);
+        remainingValue = 0;
         log.debug("new remaining value: {}", remainingValue);
     }
 

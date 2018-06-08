@@ -37,6 +37,14 @@ public class CardSummaryProjection {
         summary.setRemainingValue(summary.getRemainingValue() - evt.getAmount());
     }
 
+    @EventHandler
+    public void on(CancelEvt evt) {
+        CardSummary summary = entityManager.find(CardSummary.class, evt.getId());
+        if( summary != null) {
+            entityManager.remove(summary);
+        }
+    }
+
     @QueryHandler
     public FindCardSummariesResponse handle(FindCardSummariesQuery query) {
         log.debug("handling {}", query);

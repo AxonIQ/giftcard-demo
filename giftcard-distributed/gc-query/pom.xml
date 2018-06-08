@@ -32,11 +32,26 @@
 			<version>${axon.version}</version>
 		</dependency>
 
+		<!--<dependency>-->
+			<!--<groupId>org.axonframework</groupId>-->
+			<!--<artifactId>axon-metrics</artifactId>-->
+			<!--<version>${axon.version}</version>-->
+		<!--</dependency>-->
+
 		<!-- Spring Boot with JPA -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+
+		<!--<dependency>-->
+			<!--<groupId>org.springframework.boot</groupId>-->
+			<!--<artifactId>spring-boot-starter-web</artifactId>-->
+		<!--</dependency>-->
+		<!--<dependency>-->
+			<!--<groupId>org.springframework.boot</groupId>-->
+			<!--<artifactId>spring-boot-actuator</artifactId>-->
+		<!--</dependency>-->
 
 		<!-- AxonHub client -->
 		<dependency>
@@ -45,6 +60,10 @@
 			<version>${axonhub.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+		</dependency>
 		<!-- Embedded database Derby -->
 		<dependency>
 			<groupId>org.apache.derby</groupId>
