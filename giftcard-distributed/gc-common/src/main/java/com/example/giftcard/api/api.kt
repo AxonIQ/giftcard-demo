@@ -1,7 +1,7 @@
 package com.example.giftcard.api
 
-import java.time.Instant
 import org.axonframework.commandhandling.TargetAggregateIdentifier
+import java.time.Instant
 
 data class IssueCmd(@TargetAggregateIdentifier val id: String, val amount: Int)
 data class IssuedEvt(val id: String, val amount: Int)
@@ -14,7 +14,7 @@ data class FindCardSummariesQuery(val offset: Int, val limit: Int)
 data class FindCardSummariesResponse(val data: List<CardSummary>)
 
 class CountCardSummariesQuery { override fun toString() : String = "CountCardSummariesQuery" }
-data class CountCardSummariesResponse(val count: Int)
+data class CountCardSummariesResponse(val count: Int, val lastEvent: Long)
 
 data class CardSummary(
         var id: String? = null,

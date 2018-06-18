@@ -1,10 +1,13 @@
 package com.example.giftcard.gui;
 
 import com.example.giftcard.api.CardSummary;
+import com.example.giftcard.api.CountCardSummariesQuery;
+import com.example.giftcard.api.CountCardSummariesResponse;
 import com.example.giftcard.api.IssueCmd;
 import com.example.giftcard.api.RedeemCmd;
 import com.vaadin.annotations.Push;
 import com.vaadin.server.DefaultErrorHandler;
+import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.*;
@@ -14,7 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
-import java.util.UUID;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @SpringUI
 @Push
@@ -35,12 +41,23 @@ public class GiftcardUI extends UI {
     @Override
     protected void init(VaadinRequest vaadinRequest) {
         HorizontalLayout commandBar = new HorizontalLayout();
-        commandBar.setSizeFull();
+        commandBar.setWidth("100%");
         commandBar.addComponents(issuePanel(), bulkIssuePanel(), redeemPanel());
 
+        Grid summary = summaryGrid();
+
+        HorizontalLayout statusBar = new HorizontalLayout();
+        Label statusLabel = new Label("Status");
+        //statusBar.setSizeFull();
+        statusBar.setDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
+        statusBar.addComponent(statusLabel);
+        statusBar.setWidth("100%");
+
         VerticalLayout layout = new VerticalLayout();
-        layout.addComponents(commandBar, summaryGrid());
-        layout.setHeight(95, Unit.PERCENTAGE);
+        layout.addComponents(commandBar, summary, statusBar);
+        layout.setExpandRatio(summary, 1f);
+        layout.setSizeFull();
+
 
         setContent(layout);
 
@@ -53,6 +70,15 @@ public class GiftcardUI extends UI {
                 Notification.show("Error", cause.getMessage(), Notification.Type.ERROR_MESSAGE);
             }
         });
+
+        setPollInterval(1000);
+        int offset = Page.getCurrent().getWebBrowser().getTimezoneOffset();
+        // offset is in milliseconds
+        ZoneOffset instantOffset = ZoneOffset.ofTotalSeconds(offset/1000);
+        StatusUpdater statusUpdater = new StatusUpdater(statusLabel, instantOffset);
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(statusUpdater, 1000,
+                                                                5000, TimeUnit.MILLISECONDS);
+//        new Thread(new StatusUpdater(statusLabel)).start();
     }
 
     private Panel issuePanel() {
@@ -140,4 +166,27 @@ public class GiftcardUI extends UI {
         return grid;
     }
 
+    /**
+     * Author: marc
+     */
+    public class StatusUpdater implements Runnable {
+
+        private final Label statusLabel;
+        private final ZoneOffset instantOffset;
+
+        public StatusUpdater(Label statusLabel, ZoneOffset instantOffset) {
+            this.statusLabel = statusLabel;
+            this.instantOffset = instantOffset;
+        }
+
+        @Override
+        public void run() {
+            CountCardSummariesQuery query = new CountCardSummariesQuery();
+            queryGateway.query(
+                    query, CountCardSummariesResponse.class).whenComplete((r,exception) -> {
+                if( exception == null) statusLabel.setValue(Instant.ofEpochMilli(r.getLastEvent()).atOffset(instantOffset).toString());
+            });
+
+        }
+    }
 }
