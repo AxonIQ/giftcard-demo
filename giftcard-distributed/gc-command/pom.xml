@@ -55,4 +55,56 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>docker</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>io.fabric8</groupId>
+						<artifactId>docker-maven-plugin</artifactId>
+						<version>0.26.0</version>
+						<configuration>
+							<images>
+								<image>
+									<alias>${project.artifactId}</alias>
+									<name>eu.gcr.io/${gcloud.project.name}/${project.artifactId}:latest</name>
+
+									<build>
+										<from>openjdk:8-jdk-alpine</from>
+										<dockerFileDir>${basedir}/src/main/docker</dockerFileDir>
+										<assembly>
+											<descriptorRef>artifact</descriptorRef>
+										</assembly>
+										<args>
+											<JAR_FILE>maven/${project.build.finalName}.jar</JAR_FILE>
+										</args>
+									</build>
+
+									<run>
+										<namingStrategy>alias</namingStrategy>
+										<network>
+											<name>axoniq</name>
+										</network>
+									</run>
+								</image>
+							</images>
+							<certPath>${env.HOMEDRIVE}${env.HOMEPATH}/.docker/machine/certs</certPath>
+						</configuration>
+						<executions>
+							<execution>
+								<id>start</id>
+								<phase>package</phase>
+								<goals>
+									<goal>build</goal>
+									<goal>push</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 </project>

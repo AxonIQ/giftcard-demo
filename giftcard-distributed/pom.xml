@@ -26,6 +26,7 @@
 		<kotlin.version>1.2.21</kotlin.version>
 		<axonhub.version>1.1-SNAPSHOT</axonhub.version>
 		<vaadin.version>8.4.1</vaadin.version>
+		<gcloud.project.name>axoniq-platform</gcloud.project.name>
 	</properties>
 
 	<modules>
