@@ -28,12 +28,6 @@ public class AxonConfig {
         configuration.registerTrackingProcessor(CardSummaryProjection.class.getPackage().getName());
     }
 
-    /* A persistent event bus (event store) for event sourcing in our command model. */
-    @Bean
-    public EventBus eventBus(EventStorageEngine eventStorageEngine) {
-        return new EmbeddedEventStore(eventStorageEngine);
-    }
-
     /* We won't use Sagas. Configuring an in-mem sagastore to avoid auto-creation of a JPA-based instance. */
     @Bean
     public SagaStore sagaStore() {

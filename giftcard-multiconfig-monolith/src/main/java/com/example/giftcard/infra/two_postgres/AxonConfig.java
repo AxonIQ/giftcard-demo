@@ -22,13 +22,6 @@ public class AxonConfig {
         configuration.registerTrackingProcessor(CardSummaryProjection.class.getPackage().getName());
     }
 
-    /* A non-persistent event bus to push messages from our read model. */
-    @Bean
-    @Qualifier("queryUpdates")
-    public EventBus queryUpdateEventBus() {
-        return new SimpleEventBus();
-    }
-
     /* We won't use Sagas. Configuring an in-mem sagastore to avoid auto-creation of a JPA-based instance. */
     @Bean
     public SagaStore sagaStore() {
