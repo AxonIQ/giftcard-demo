@@ -4,9 +4,12 @@ import com.example.giftcard.query.*;
 import com.vaadin.data.provider.CallbackDataProvider;
 import org.axonframework.eventhandling.*;
 import org.axonframework.queryhandling.QueryGateway;
+import org.axonframework.queryhandling.SubscriptionQueryResult;
+import org.axonframework.queryhandling.responsetypes.ResponseTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.smartcardio.Card;
 import java.lang.invoke.MethodHandles;
 import java.util.UUID;
 
@@ -14,38 +17,32 @@ public class CardSummaryDataProvider extends CallbackDataProvider<CardSummary, V
 
     private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final SubscribingEventProcessor processor;
+    private final SubscriptionQueryResult<Integer, CardProjectionUpdated> subscriptionQueryResult;
 
-    public CardSummaryDataProvider(QueryGateway queryGateway, EventBus queryUpdateEventBus) {
+    public CardSummaryDataProvider(QueryGateway queryGateway) {
         super(
                 q -> {
                     FindCardSummariesQuery query = new FindCardSummariesQuery(q.getOffset(), q.getLimit());
-                    FindCardSummariesResponse response = queryGateway.send(
-                            query, FindCardSummariesResponse.class).join();
-                    return response.getData().stream();
+                    return queryGateway.query(query, ResponseTypes.multipleInstancesOf(CardSummary.class))
+                            .join().stream();
                 },
                 q -> {
                     CountCardSummariesQuery query = new CountCardSummariesQuery();
-                    CountCardSummariesResponse response = queryGateway.send(
-                            query, CountCardSummariesResponse.class).join();
-                    return response.getCount();
+                    return queryGateway.query(query, ResponseTypes.instanceOf(Integer.class)).join();
                 }
         );
 
-        EventListener listener = new AnnotationEventListenerAdapter(this);
-        processor = new SubscribingEventProcessor(UUID.randomUUID().toString(),
-                new SimpleEventHandlerInvoker(listener), queryUpdateEventBus);
-        processor.start();
+        subscriptionQueryResult = queryGateway.subscriptionQuery(new CountCardSummariesQuery(), ResponseTypes.instanceOf(Integer.class),
+                ResponseTypes.instanceOf(CardProjectionUpdated.class));
+
+        subscriptionQueryResult.handle(x -> {}, x -> {
+            log.debug("received query update, refreshing data provider");
+            refreshAll();
+        });
     }
 
     public void shutDown() {
-        processor.shutDown();
-    }
-
-    @EventHandler
-    public void on(CardSummariesUpdatedEvt evt) {
-        log.info("received {}", evt);
-        refreshAll();
+        subscriptionQueryResult.cancel();
     }
 
 }

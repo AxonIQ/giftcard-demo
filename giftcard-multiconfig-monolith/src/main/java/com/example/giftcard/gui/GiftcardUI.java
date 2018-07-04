@@ -26,14 +26,12 @@ public class GiftcardUI extends UI {
 
     private final CommandGateway commandGateway;
     private final QueryGateway queryGateway;
-    private final EventBus queryUpdateEventBus;
 
     private CardSummaryDataProvider cardSummaryDataProvider;
 
-    public GiftcardUI(CommandGateway commandGateway, QueryGateway queryGateway, @Qualifier("queryUpdates") EventBus queryUpdateEventBus) {
+    public GiftcardUI(CommandGateway commandGateway, QueryGateway queryGateway) {
         this.commandGateway = commandGateway;
         this.queryGateway = queryGateway;
-        this.queryUpdateEventBus = queryUpdateEventBus;
     }
 
     @Override
@@ -126,7 +124,7 @@ public class GiftcardUI extends UI {
     }
 
     private Grid summaryGrid() {
-        cardSummaryDataProvider = new CardSummaryDataProvider(queryGateway, queryUpdateEventBus);
+        cardSummaryDataProvider = new CardSummaryDataProvider(queryGateway);
         Grid<CardSummary> grid = new Grid<>();
         grid.addColumn(CardSummary::getId).setCaption("Card ID");
         grid.addColumn(CardSummary::getInitialValue).setCaption("Initial value");

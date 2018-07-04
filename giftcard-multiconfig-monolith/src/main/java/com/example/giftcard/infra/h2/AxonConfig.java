@@ -30,16 +30,8 @@ public class AxonConfig {
 
     /* A persistent event bus (event store) for event sourcing in our command model. */
     @Bean
-    @Primary
     public EventBus eventBus(EventStorageEngine eventStorageEngine) {
         return new EmbeddedEventStore(eventStorageEngine);
-    }
-
-    /* A non-persistent event bus to push messages from our read model. */
-    @Bean
-    @Qualifier("queryUpdates")
-    public EventBus queryUpdateEventBus() {
-        return new SimpleEventBus();
     }
 
     /* We won't use Sagas. Configuring an in-mem sagastore to avoid auto-creation of a JPA-based instance. */

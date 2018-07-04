@@ -12,10 +12,8 @@ data class CardSummary(
         var remainingValue: Int? = null
         )
 
-data class CardSummariesUpdatedEvt(val id: String)
+class CardProjectionUpdated { override fun toString() : String = "CardProjectionUpdated" }
 
 data class FindCardSummariesQuery(val offset: Int, val limit: Int)
-data class FindCardSummariesResponse(val data: List<CardSummary>)
 
 class CountCardSummariesQuery { override fun toString() : String = "CountCardSummariesQuery" }
-data class CountCardSummariesResponse(val count: Int)
