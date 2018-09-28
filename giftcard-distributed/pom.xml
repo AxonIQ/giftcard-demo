@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.example</groupId>
+	<groupId>io.axoniq.demo</groupId>
 	<artifactId>giftcard-distributed</artifactId>
 	<version>1.0</version>
 	<packaging>pom</packaging>
@@ -21,12 +21,30 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
 		<java.version>1.8</java.version>
-		<axon.version>3.3.5</axon.version>
-		<kotlin.version>1.2.21</kotlin.version>
-		<axonhub.version>1.1.1</axonhub.version>
+		<kotlin.version>1.2.71</kotlin.version>
+
+		<maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
+
+		<axon.version>4.0-M2</axon.version>
+
 		<vaadin.version>8.2.0</vaadin.version>
 	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven.compiler.plugin.version}</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 	<modules>
 		<module>gc-common</module>
@@ -34,5 +52,12 @@
 		<module>gc-query</module>
 		<module>gc-gui</module>
 	</modules>
+
+	<repositories>
+		<repository>
+			<id>axoniq-nexus</id>
+			<url>https://dev-nexus.axoniq.io/repository/products</url>
+		</repository>
+	</repositories>
 
 </project>

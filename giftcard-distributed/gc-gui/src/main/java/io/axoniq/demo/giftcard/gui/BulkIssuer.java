@@ -1,6 +1,6 @@
-package com.example.giftcard.gui;
+package io.axoniq.demo.giftcard.gui;
 
-import com.example.giftcard.api.IssueCmd;
+import io.axoniq.demo.giftcard.api.IssueCmd;
 import com.vaadin.ui.UI;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.slf4j.Logger;
@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class BulkIssuer {

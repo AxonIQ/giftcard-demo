@@ -1,8 +1,7 @@
-package com.example.giftcard.gui;
+package io.axoniq.demo.giftcard.gui;
 
-import com.example.giftcard.api.CardSummary;
-import com.example.giftcard.api.IssueCmd;
-import com.example.giftcard.api.RedeemCmd;
+import com.vaadin.server.Page;
+import io.axoniq.demo.giftcard.api.*;
 import com.vaadin.annotations.Push;
 import com.vaadin.server.DefaultErrorHandler;
 import com.vaadin.server.VaadinRequest;
@@ -14,7 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
-import java.util.UUID;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 @SpringUI
 @Push
@@ -26,6 +29,7 @@ public class GiftcardUI extends UI {
     private final QueryGateway queryGateway;
 
     private CardSummaryDataProvider cardSummaryDataProvider;
+    private ScheduledFuture<?> updaterThread;
 
     public GiftcardUI(CommandGateway commandGateway, QueryGateway queryGateway) {
         this.commandGateway = commandGateway;
@@ -35,12 +39,21 @@ public class GiftcardUI extends UI {
     @Override
     protected void init(VaadinRequest vaadinRequest) {
         HorizontalLayout commandBar = new HorizontalLayout();
-        commandBar.setSizeFull();
+        commandBar.setWidth("100%");
         commandBar.addComponents(issuePanel(), bulkIssuePanel(), redeemPanel());
 
+        Grid summary = summaryGrid();
+
+        HorizontalLayout statusBar = new HorizontalLayout();
+        Label statusLabel = new Label("Status");
+        statusBar.setDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
+        statusBar.addComponent(statusLabel);
+        statusBar.setWidth("100%");
+
         VerticalLayout layout = new VerticalLayout();
-        layout.addComponents(commandBar, summaryGrid());
-        layout.setHeight(95, Unit.PERCENTAGE);
+        layout.addComponents(commandBar, summary, statusBar);
+        layout.setExpandRatio(summary, 1f);
+        layout.setSizeFull();
 
         setContent(layout);
 
@@ -53,6 +66,22 @@ public class GiftcardUI extends UI {
                 Notification.show("Error", cause.getMessage(), Notification.Type.ERROR_MESSAGE);
             }
         });
+
+        setPollInterval(1000);
+        int offset = Page.getCurrent().getWebBrowser().getTimezoneOffset();
+        // offset is in milliseconds
+             ZoneOffset instantOffset = ZoneOffset.ofTotalSeconds(offset/1000);
+        StatusUpdater statusUpdater = new StatusUpdater(statusLabel, instantOffset);
+        updaterThread = Executors.newScheduledThreadPool(1).scheduleAtFixedRate(statusUpdater, 1000,
+                                                                     5000, TimeUnit.MILLISECONDS);
+        setPollInterval(1000);
+        getSession().getSession().setMaxInactiveInterval(30);
+        addDetachListener((DetachListener) detachEvent -> {
+             log.warn("Closing UI");
+             updaterThread.cancel(true);
+
+        });
+
     }
 
     private Panel issuePanel() {
@@ -140,4 +169,24 @@ public class GiftcardUI extends UI {
         return grid;
     }
 
+    public class StatusUpdater implements Runnable {
+        private final Label statusLabel;
+         private final ZoneOffset instantOffset;
+
+         public StatusUpdater(Label statusLabel, ZoneOffset instantOffset) {
+             this.statusLabel = statusLabel;
+             this.instantOffset = instantOffset;
+         }
+
+         @Override
+         public void run() {
+             CountCardSummariesQuery query = new CountCardSummariesQuery();
+             queryGateway.query(
+                     query, CountCardSummariesResponse.class).whenComplete((r, exception) -> {
+                 if( exception == null) statusLabel.setValue(Instant.ofEpochMilli(r.getLastEvent()).atOffset(instantOffset).toString());
+             });
+
+         }
+
+    }
 }

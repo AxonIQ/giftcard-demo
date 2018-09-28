@@ -3,7 +3,6 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.example</groupId>
 	<artifactId>gc-gui</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
@@ -12,15 +11,16 @@
 	<description>Giftcard-distributed GUI</description>
 
     <parent>
-        <groupId>com.example</groupId>
+        <groupId>io.axoniq.demo</groupId>
         <artifactId>giftcard-distributed</artifactId>
         <version>1.0</version>
     </parent>
 
 	<dependencies>
+
 		<!-- Our api classes -->
 		<dependency>
-			<groupId>com.example</groupId>
+			<groupId>io.axoniq.demo</groupId>
 			<artifactId>gc-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -32,13 +32,6 @@
 			<version>${axon.version}</version>
 		</dependency>
 
-		<!-- AxonHub client -->
-		<dependency>
-			<groupId>io.axoniq</groupId>
-			<artifactId>axonhub-spring-boot-autoconfigure</artifactId>
-			<version>${axonhub.version}</version>
-		</dependency>
-
 		<!-- Vaadin -->
 		<dependency>
 			<groupId>com.vaadin</groupId>
@@ -48,9 +41,11 @@
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-push</artifactId>
 		</dependency>
+
 	</dependencies>
 
 	<dependencyManagement>
+
 		<dependencies>
 			<dependency>
 				<groupId>com.vaadin</groupId>
@@ -60,6 +55,7 @@
 				<scope>import</scope>
 			</dependency>
 		</dependencies>
+
 	</dependencyManagement>
 
 	<build>

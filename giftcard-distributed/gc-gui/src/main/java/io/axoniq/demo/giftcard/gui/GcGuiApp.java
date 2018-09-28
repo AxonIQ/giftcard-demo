@@ -1,9 +1,10 @@
-package com.example.giftcard.gui;
+package io.axoniq.demo.giftcard.gui;
 
-import com.example.giftcard.api.CountCardSummariesQuery;
-import com.example.giftcard.api.CountCardSummariesResponse;
+import io.axoniq.demo.giftcard.api.CountCardSummariesQuery;
+import io.axoniq.demo.giftcard.api.CountCardSummariesResponse;
+
+import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
-import org.axonframework.queryhandling.responsetypes.ResponseTypes;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;

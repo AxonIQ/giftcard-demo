@@ -1,9 +1,6 @@
-package com.example.giftcard.command;
+package io.axoniq.demo.giftcard.command;
 
-import com.example.giftcard.api.IssueCmd;
-import com.example.giftcard.api.IssuedEvt;
-import com.example.giftcard.api.RedeemCmd;
-import com.example.giftcard.api.RedeemedEvt;
+import io.axoniq.demo.giftcard.api.*;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.commandhandling.model.AggregateIdentifier;
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -43,6 +40,12 @@ public class GiftCard {
         apply(new RedeemedEvt(id, cmd.getAmount()));
     }
 
+    @CommandHandler
+    public void handle(CancelCmd cmd) {
+        log.debug("handling {}", cmd);
+        apply(new CancelEvt(id));
+    }
+
     @EventSourcingHandler
     public void on(IssuedEvt evt) {
         log.debug("applying {}", evt);
@@ -58,4 +61,10 @@ public class GiftCard {
         log.debug("new remaining value: {}", remainingValue);
     }
 
+    @EventSourcingHandler
+    public void on(CancelEvt evt) {
+        log.debug("applying {}", evt);
+        remainingValue = 0;
+        log.debug("new remaining value: {}", remainingValue);
+    }
 }
