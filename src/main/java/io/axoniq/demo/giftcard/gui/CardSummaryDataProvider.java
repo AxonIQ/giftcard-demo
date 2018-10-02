@@ -3,7 +3,7 @@ package io.axoniq.demo.giftcard.gui;
 import com.vaadin.data.provider.AbstractBackEndDataProvider;
 import com.vaadin.data.provider.DataChangeEvent;
 import com.vaadin.data.provider.Query;
-import io.axoniq.demo.giftcard.query.*;
+import io.axoniq.demo.giftcard.api.*;
 import lombok.*;
 import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
@@ -30,7 +30,7 @@ public class CardSummaryDataProvider extends AbstractBackEndDataProvider<CardSum
      */
 
     private SubscriptionQueryResult<List<CardSummary>, CardSummary> fetchQueryResult;
-    private SubscriptionQueryResult<Integer, CountChangedUpdate> countQueryResult;
+    private SubscriptionQueryResult<CountCardSummariesResponse, CountChangedUpdate> countQueryResult;
 
     @Getter
     @Setter
@@ -85,7 +85,7 @@ public class CardSummaryDataProvider extends AbstractBackEndDataProvider<CardSum
         CountCardSummariesQuery countCardSummariesQuery = new CountCardSummariesQuery(filter);
         log.trace("submitting {}", countCardSummariesQuery);
         countQueryResult = queryGateway.subscriptionQuery(countCardSummariesQuery,
-                ResponseTypes.instanceOf(Integer.class),
+                ResponseTypes.instanceOf(CountCardSummariesResponse.class),
                 ResponseTypes.instanceOf(CountChangedUpdate.class));
         /* When the count changes (new giftcards issued), the UI has to do an entirely new query (this is
          * how the Vaadin grid works). When we're bulk issuing, it doesn't make sense to do that on every single
@@ -99,7 +99,7 @@ public class CardSummaryDataProvider extends AbstractBackEndDataProvider<CardSum
 //                        fireEvent(new DataChangeEvent(this));
                     executorService.execute(() -> fireEvent(new DataChangeEvent<>(this)));
                 });
-        return countQueryResult.initialResult().block();
+        return countQueryResult.initialResult().block().getCount();
     }
 
     @Synchronized

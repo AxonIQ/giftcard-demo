@@ -8,14 +8,13 @@ import org.axonframework.queryhandling.QueryGateway;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
 
-@SpringBootApplication
-public class GcGuiApp {
-
-	public static void main(String[] args) {
-		SpringApplication.run(GcGuiApp.class, args);
-	}
+@Component
+@Profile("gui")
+public class GcGuiConfiguration {
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void helloHub(ApplicationReadyEvent event) {

@@ -1,7 +1,6 @@
 package io.axoniq.demo.giftcard.query;
 
-import io.axoniq.demo.giftcard.api.IssuedEvt;
-import io.axoniq.demo.giftcard.api.RedeemedEvt;
+import io.axoniq.demo.giftcard.api.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.eventhandling.EventHandler;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import java.time.Instant;
 import java.util.List;
 
 @Component
@@ -73,11 +73,11 @@ public class CardSummaryProjection {
     }
 
     @QueryHandler
-    public Integer handle(CountCardSummariesQuery query) {
+    public CountCardSummariesResponse handle(CountCardSummariesQuery query) {
         log.trace("handling {}", query);
         TypedQuery<Long> jpaQuery = entityManager.createNamedQuery("CardSummary.count", Long.class);
         jpaQuery.setParameter("idStartsWith", query.getFilter().getIdStartsWith());
-        return log.exit(jpaQuery.getSingleResult().intValue());
+        return log.exit(new CountCardSummariesResponse(jpaQuery.getSingleResult().intValue(), Instant.now().toEpochMilli()));
     }
 
 }

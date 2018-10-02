@@ -7,16 +7,13 @@ import org.axonframework.eventsourcing.CachingEventSourcingRepository;
 import org.axonframework.eventsourcing.GenericAggregateFactory;
 import org.axonframework.eventsourcing.eventstore.EventStore;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
-@SpringBootApplication
-public class GcCommandApp {
-
-	public static void main(String[] args) {
-		SpringApplication.run(GcCommandApp.class, args);
-	}
+@Component
+@Profile("command")
+public class GcCommandConfiguration {
 
 	@Bean
 	public Repository<GiftCard> giftCardRepository(EventStore eventStore, Cache cache) {
