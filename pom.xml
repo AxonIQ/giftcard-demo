@@ -58,7 +58,7 @@
 			<version>${axon.version}</version>
 		</dependency>
 
-		<!-- Vanilly Spring Boot to start with -->
+		<!-- Vanilla Spring Boot to start with -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
@@ -202,12 +202,5 @@
 
 		</plugins>
 	</build>
-
-	<repositories>
-		<repository>
-			<id>axoniq-nexus</id>
-			<url>https://dev-nexus.axoniq.io/repository/products</url>
-		</repository>
-	</repositories>
 
 </project>
