@@ -22,7 +22,7 @@ spec:
         imagePullPolicy: Always
         ports:
         - name: grpc
-          ontainerPort: 8124
+          containerPort: 8124
           protocol: TCP
         - name: gui
           containerPort: 8024

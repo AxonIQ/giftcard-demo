@@ -95,7 +95,19 @@ When you start the client containers, you can now use "`--link axonserver`" to p
 
 You can use the same files in the "`docker`" directory also for running Axon Server in Kubernetes. Assuming you have access to a working cluster, either using Mini-Kube or with a 'real' setup, make sure you have the Docker environment variables set correctly to use it. With Mini-Kube this is done using the "`minikube docker-env`" command, with the Google Cloud SDK use "`gcloud auth configure-docker`".
 
-Deployment requires the use of a YAML descriptor, an example of which can be found in the "`kubernetes`" directory.
+Deployment requires the use of a YAML descriptor, an working example of which can be found in the "`kubernetes`" directory. To run it, use the following commands in a separate window:
+
+    ```
+    $ kubectl apply -f kubernetes/axonserver.yaml
+    statefulset.apps "axonserver" created
+    service "axonserver-gui" created
+    service "axonserver" created
+    $ kubectl port-forward axonserver-0 8124
+    Forwarding from 127.0.0.1:8124 -> 8124
+    Forwarding from [::1]:8124 -> 8124
+    ```
+
+You can now run the Giftcard app, which will connect throught the proxied gRPC port. To see the Axon Server Web GUI, use "`minikube service --url axonserver-gui`" to obtain the URL for your browser. Actually, if you leave out the "`--url`", minikube will open the the GUI in your default browser for you.
 
 ## Configuring Axon Server
 
