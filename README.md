@@ -109,6 +109,17 @@ Deployment requires the use of a YAML descriptor, an working example of which ca
 
 You can now run the Giftcard app, which will connect throught the proxied gRPC port. To see the Axon Server Web GUI, use "`minikube service --url axonserver-gui`" to obtain the URL for your browser. Actually, if you leave out the "`--url`", minikube will open the the GUI in your default browser for you.
 
+To clean up the deployment, use:
+
+    ```
+    $ kubectl delete sts axonserver
+    statefulset.apps "axonserver" deleted
+    $ kubectl delete svc axonserver
+    service "axonserver" deleted
+    $ kubectl delete svc axonserver-gui
+    service "axonserver-gui" deleted
+    ```
+
 ## Configuring Axon Server
 
 Axon Server uses sensible defaults for all of its settings, so it will actually run fine without any further configuration. However, if you want to make some changes, below are the most common options.
