@@ -119,6 +119,39 @@ $ kubectl delete svc axonserver-gui
 service "axonserver-gui" deleted
 ```
 
+If you're using a 'real' Kubernetes cluster, you'll naturally not want to use "`localhost`" as hostname for Axon Server, so you need to add three lines to the container spec to specify the "`AXONSERVER_HOSTNAME`" setting:
+
+```
+...
+      containers:
+      - name: axonserver
+        image: axoniq/axonserver
+        imagePullPolicy: Always
+        ports:
+        - name: grpc
+          containerPort: 8124
+          protocol: TCP
+        - name: gui
+          containerPort: 8024
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            port: 8024
+            path: /actuator/health
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 1
+        env:
+        - name: AXONSERVER_HOSTNAME
+          value: axonserver
+---
+apiVersion: v1
+kind: Service
+...
+```
+
+Use "`axonserver`" (as that is the name of the Kubernetes service) if you're going to deploy the client next to the server in the cluster, which is what you'ld probably want. Running the client outside the cluster, with Axon Server *inside*, entails extra work to enable and secure this, and is definitely beyond the scope of this example.
+
 ## Configuring Axon Server
 
 Axon Server uses sensible defaults for all of its settings, so it will actually run fine without any further configuration. However, if you want to make some changes, below are the most common options.
