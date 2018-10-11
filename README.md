@@ -1,5 +1,6 @@
-# giftcard-demo-series
-The Axon Framework Giftcard demo applications focus around a simple gift card domain, designed to show various aspects of the framework. The app can be run in various modes, using [Spring-boot Profiles](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-profiles.html): by selecting a specific profile, only the corresponding parts of the app will be active. Select none, and the default behaviour is activated, which activates everything. This way you can experiment with Axon in a (structured) monolith as well as in micro-services.
+# giftcard-demo
+
+The Axon Framework Giftcard demo application focuses around a simple gift card domain, designed to show various aspects of the framework. The app can be run in various modes, using [Spring-boot Profiles](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-profiles.html): by selecting a specific profile, only the corresponding parts of the app will be active. Select none, and the default behaviour is activated, which activates everything. This way you can experiment with Axon in a (structured) monolith as well as in micro-services.
 
 ## The Gifcard app
 
@@ -20,39 +21,39 @@ Of these packages, `command`, `query`, and `gui` are also configured as profiles
 ### Building the Giftcard app from the sources
 To build the demo app, simply run the provided [Maven wrapper](https://www.baeldung.com/maven-wrapper):
 
-    ```
-        mvnw clean package
-    ```
+```
+mvnw clean package
+```
 Note that for Mac OSX or Linux you probably have to add "`./`" in front of `mvnw`.
 
 ## Running the Giftcard app
 
 The simplest way to run the app is by using the Spring-boot maven plugin:
 
-    ```
-        mvnw spring-boot:run
-    ```
+```
+mvnw spring-boot:run
+```
 However, if you have copied the jar file `giftcard-distributed-1.0.jar` from the Maven `target` directory to some other location, you can also start it with:
 
-    ```
-        java -jar giftcard-distributed-1.0.jar
-    ```
+```
+java -jar giftcard-distributed-1.0.jar
+```
 The Web GUI can be found at [`http://localhost:8080`](http://localhost:8080).
 
 If you want to activate only the `command` profile, use:
 
-    ```
-        java -Dspring.profiles.active=command giftcard-distributed-1.0.jar
-    ```
+```
+java -Dspring.profiles.active=command giftcard-distributed-1.0.jar
+```
 Idem for `query` and `gui`.
 
 ### Running the Giftcard app as micro-services
 
 To run the Giftcard app as if it were three seperate micro-services, use the Spring-boot `spring.profiles.active` option as follows:
 
-    ```
-        $ java -Dspring.profiles.active=command -jar giftcard-distributed-1.0.jar
-    ```
+```
+$ java -Dspring.profiles.active=command -jar giftcard-distributed-1.0.jar
+```
 This will start only the command part. To complete the app, open two other command shells, and start one with profile `query`, and the last one with `gui`. Again you can open the Web GUI at [`http://localhost:8080`](http://localhost:8080). The three parts of the application work together through the running instance of the Axon Server, which distributes the Commands, Queries, and Events.
 
 ## Running Axon Server
@@ -63,9 +64,9 @@ By default the Axon Framework is configured to expect a running Axon Server inst
 
 To run Axon Server locally, all you need to do is put the server JAR file in the directory where you want it to live, and start it using:
 
-    ```
-        java -jar axonserver-4.0-exec.jar
-    ```
+```
+java -jar axonserver-4.0-exec.jar
+```
 
 You will see that it creates a subdirectory `data` where it will store its information.
 
@@ -73,19 +74,19 @@ You will see that it creates a subdirectory `data` where it will store its infor
 
 To run Axon Server in Docker you can use the image provided on Docker Hub:
 
-    ```
-        $ docker run -d --name my-axon-server -p 8024:8024 -p 8124:8124 axoniq/axonserver
-        ...some container id...
-        $
-    ```
+```
+$ docker run -d --name my-axon-server -p 8024:8024 -p 8124:8124 axoniq/axonserver
+...some container id...
+$
+```
 
 *WARNING* This is not a supported image for production purposes. Please use with caution.
 
 This image will force Axon Server to use "`localhost`" as its own hostname by default, so applications outside the container can reach it. If you want to run the clients in Docker containers as well, and are not using something like Kubernetes, use the "`--hostname`" option of the `docker` command to set a useful name like "axonserver", and pass the `AXONSERVER_HOSTNAME` environment variable to adjust the properties accordingly:
 
-    ```
-        $ docker run -d --name my-axon-server -p 8024:8024 -p 8124:8124 --hostname axonserver -e AXONSERVER_HOSTNAME=axonserver axoniq/axonserver
-    ```
+```
+$ docker run -d --name my-axon-server -p 8024:8024 -p 8124:8124 --hostname axonserver -e AXONSERVER_HOSTNAME=axonserver axoniq/axonserver
+```
 
 When you start the client containers, you can now use "`--link axonserver`" to provide them with the correct DNS entry. The Axon Server-connector looks at the "`axon.axonserver.servers`" property to determine where Axon Server lives, so don't forget to set it to "`axonserver`".
 
@@ -93,32 +94,30 @@ When you start the client containers, you can now use "`--link axonserver`" to p
 
 *WARNING*: Although you can get a pretty functional cluster running locally using Mini-Kube, you can run into trouble when you want to let it serve clients outside of the cluster. Mini-Kube can provide access to HTTP servers running in the cluster, for other protocols you have to run a special protocol-agnostic proxy like you can with "`kubectl port-forward` _&lt;pod-name&gt;_ _&lt;port-number&gt;_". For non-development scenarios, we don't recommend using Mini-Kube.
 
-You can use the same files in the "`docker`" directory also for running Axon Server in Kubernetes. Assuming you have access to a working cluster, either using Mini-Kube or with a 'real' setup, make sure you have the Docker environment variables set correctly to use it. With Mini-Kube this is done using the "`minikube docker-env`" command, with the Google Cloud SDK use "`gcloud auth configure-docker`".
-
 Deployment requires the use of a YAML descriptor, an working example of which can be found in the "`kubernetes`" directory. To run it, use the following commands in a separate window:
 
-    ```
-    $ kubectl apply -f kubernetes/axonserver.yaml
-    statefulset.apps "axonserver" created
-    service "axonserver-gui" created
-    service "axonserver" created
-    $ kubectl port-forward axonserver-0 8124
-    Forwarding from 127.0.0.1:8124 -> 8124
-    Forwarding from [::1]:8124 -> 8124
-    ```
+```
+$ kubectl apply -f kubernetes/axonserver.yaml
+statefulset.apps "axonserver" created
+service "axonserver-gui" created
+service "axonserver" created
+$ kubectl port-forward axonserver-0 8124
+Forwarding from 127.0.0.1:8124 -> 8124
+Forwarding from [::1]:8124 -> 8124
+```
 
 You can now run the Giftcard app, which will connect throught the proxied gRPC port. To see the Axon Server Web GUI, use "`minikube service --url axonserver-gui`" to obtain the URL for your browser. Actually, if you leave out the "`--url`", minikube will open the the GUI in your default browser for you.
 
 To clean up the deployment, use:
 
-    ```
-    $ kubectl delete sts axonserver
-    statefulset.apps "axonserver" deleted
-    $ kubectl delete svc axonserver
-    service "axonserver" deleted
-    $ kubectl delete svc axonserver-gui
-    service "axonserver-gui" deleted
-    ```
+```
+$ kubectl delete sts axonserver
+statefulset.apps "axonserver" deleted
+$ kubectl delete svc axonserver
+service "axonserver" deleted
+$ kubectl delete svc axonserver-gui
+service "axonserver-gui" deleted
+```
 
 ## Configuring Axon Server
 
