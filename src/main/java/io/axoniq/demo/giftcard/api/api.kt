@@ -1,6 +1,6 @@
 package io.axoniq.demo.giftcard.api
 
-import org.axonframework.commandhandling.TargetAggregateIdentifier
+import org.axonframework.modelling.command.TargetAggregateIdentifier
 
 import javax.persistence.Entity
 import javax.persistence.Id
