@@ -78,7 +78,7 @@ By default the Axon Framework is configured to expect a running Axon Server inst
 To run Axon Server locally, all you need to do is put the server JAR file in the directory where you want it to live, and start it using:
 
 ```
-java -jar axonserver-4.0-exec.jar
+java -jar axonserver-4.0-RC1.jar
 ```
 
 You will see that it creates a subdirectory `data` where it will store its information.
@@ -95,7 +95,7 @@ $
 
 *WARNING* This is not a supported image for production purposes. Please use with caution.
 
-This image will force Axon Server to use "`localhost`" as its own hostname by default, so applications outside the container can reach it. If you want to run the clients in Docker containers as well, and are not using something like Kubernetes, use the "`--hostname`" option of the `docker` command to set a useful name like "axonserver", and pass the `AXONSERVER_HOSTNAME` environment variable to adjust the properties accordingly:
+If you want to run the clients in Docker containers as well, and are not using something like Kubernetes, use the "`--hostname`" option of the `docker` command to set a useful name like "axonserver", and pass the `AXONSERVER_HOSTNAME` environment variable to adjust the properties accordingly:
 
 ```
 $ docker run -d --name my-axon-server -p 8024:8024 -p 8124:8124 --hostname axonserver -e AXONSERVER_HOSTNAME=axonserver axoniq/axonserver
