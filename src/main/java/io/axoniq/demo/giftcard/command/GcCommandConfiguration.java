@@ -15,7 +15,7 @@ public class GcCommandConfiguration {
 
 	@Bean
 	public Repository<GiftCard> giftCardRepository(EventStore eventStore, Cache cache) {
-		return EventSourcingRepository.<GiftCard>builder()
+		return EventSourcingRepository.builder(GiftCard.class)
 				.cache(cache).eventStore(eventStore)
 				.build();
 	}

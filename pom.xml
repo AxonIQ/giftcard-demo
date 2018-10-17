@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>io.axoniq.demo</groupId>
-	<artifactId>giftcard-distributed</artifactId>
+	<artifactId>giftcard-demo</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
 
-	<name>giftcard-distributed</name>
-	<description>Axon Framework demo project, distributed using the AxonIQ platform</description>
+	<name>giftcard-demo</name>
+	<description>Axon Framework demo project</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -27,7 +27,7 @@
 
 		<maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
 
-		<axon.version>4.0-SNAPSHOT</axon.version>
+		<axon.version>4.0-RC1</axon.version>
 
 		<vaadin.version>8.2.0</vaadin.version>
         <lombok.version>1.18.0</lombok.version>
@@ -118,14 +118,8 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-ext</artifactId>
 		</dependency>
-<!-- For Java 9 and 10
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>2.3.0</version>
-		</dependency>
--->
-		<!-- For Java 11 -->
+
+		<!-- For Spring-boot, since Java 9-->
 		<dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
