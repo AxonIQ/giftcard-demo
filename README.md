@@ -1,8 +1,19 @@
-# giftcard-demo
+Getting started with Axon
+=========================
 
-The Axon Framework Giftcard demo application focuses around a simple gift card domain, designed to show various aspects of the framework. The app can be run in various modes, using [Spring-boot Profiles](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-profiles.html): by selecting a specific profile, only the corresponding parts of the app will be active. Select none, and the default behaviour is activated, which activates everything. This way you can experiment with Axon in a (structured) monolith as well as in micro-services.
+This Axon Framework demo application focuses around a simple giftcard domain, designed to show various aspects of the framework. The app can be run in various modes, using [Spring-boot Profiles](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-profiles.html): by selecting a specific profile, only the corresponding parts of the app will be active. Select none, and the default behaviour is activated, which activates everything. This way you can experiment with Axon in a (structured) monolith as well as in micro-services.
 
-## The Gifcard app
+Where to find more information:
+-------------------------------
+
+* The [Axon Reference Guide](https://docs.axoniq.io/reference-guide/) is definitive guide on the Axon Framework and Axon Server.
+* Visit [www.axoniq.io](https://www.axoniq.io) to find out about AxonIQ, the team behind the Axon Framework and Server.
+* Subscribe to the [AxonIQ Youtube channel](https://www.youtube.com/AxonIQ) to get the latest Webinars, announcements, and customer stories.
+* The latest version of the Giftcard App can be found [on GitHub](https://github.com/AxonIQ/giftcard-demo).
+* Docker images for Axon Server are pushed to [Docker Hub](https://hub.docker.com/u/axoniq).
+
+The Giftcard app
+----------------
 
 ### Background story
 See [the wikipedia article](https://en.wikipedia.org/wiki/Gift_card) for a basic definition of gift cards. Essentially, there are just two events in the life cycle of a gift card:
@@ -26,7 +37,8 @@ mvnw clean package
 ```
 Note that for Mac OSX or Linux you probably have to add "`./`" in front of `mvnw`.
 
-## Running the Giftcard app
+Running the Giftcard app
+------------------------
 
 The simplest way to run the app is by using the Spring-boot maven plugin:
 
@@ -56,7 +68,8 @@ $ java -Dspring.profiles.active=command -jar giftcard-distributed-1.0.jar
 ```
 This will start only the command part. To complete the app, open two other command shells, and start one with profile `query`, and the last one with `gui`. Again you can open the Web GUI at [`http://localhost:8080`](http://localhost:8080). The three parts of the application work together through the running instance of the Axon Server, which distributes the Commands, Queries, and Events.
 
-## Running Axon Server
+Running Axon Server
+-------------------
 
 By default the Axon Framework is configured to expect a running Axon Server instance, and it will complain if the server is not found. To run Axon Server, you'll need a Java runtime (JRE versions 8 through 10 are currently supported, Java 11 still has Spring-boot related growing-pains).  A copy of the server JAR file has been provided in the demo package. You can run it locally, in a Docker container (including Kubernetes or even Mini-kube), or on a separate server.
 
@@ -152,7 +165,8 @@ kind: Service
 
 Use "`axonserver`" (as that is the name of the Kubernetes service) if you're going to deploy the client next to the server in the cluster, which is what you'ld probably want. Running the client outside the cluster, with Axon Server *inside*, entails extra work to enable and secure this, and is definitely beyond the scope of this example.
 
-## Configuring Axon Server
+Configuring Axon Server
+-----------------------
 
 Axon Server uses sensible defaults for all of its settings, so it will actually run fine without any further configuration. However, if you want to make some changes, below are the most common options.
 
