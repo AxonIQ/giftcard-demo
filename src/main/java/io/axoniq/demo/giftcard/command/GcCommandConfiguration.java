@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile("command")
-public class GcCommandConfiguration {
+class GcCommandConfiguration {
 
 	@Bean
 	public Repository<GiftCard> giftCardRepository(EventStore eventStore, Cache cache) {

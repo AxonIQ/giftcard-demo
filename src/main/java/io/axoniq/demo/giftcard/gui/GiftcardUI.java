@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 @SpringUI
 @Push
 @Profile("gui")
-public class GiftcardUI extends UI {
+class GiftcardUI extends UI {
 
     private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -64,7 +64,7 @@ public class GiftcardUI extends UI {
             public void error(com.vaadin.server.ErrorEvent event) {
                 Throwable cause = event.getThrowable();
                 log.error("an error occured", cause);
-                while(cause.getCause() != null) cause = cause.getCause();
+                while (cause.getCause() != null) cause = cause.getCause();
                 Notification.show("Error", cause.getMessage(), Notification.Type.ERROR_MESSAGE);
             }
         });
@@ -72,15 +72,15 @@ public class GiftcardUI extends UI {
         setPollInterval(1000);
         int offset = Page.getCurrent().getWebBrowser().getTimezoneOffset();
         // offset is in milliseconds
-             ZoneOffset instantOffset = ZoneOffset.ofTotalSeconds(offset/1000);
+        ZoneOffset instantOffset = ZoneOffset.ofTotalSeconds(offset / 1000);
         StatusUpdater statusUpdater = new StatusUpdater(statusLabel, instantOffset);
         updaterThread = Executors.newScheduledThreadPool(1).scheduleAtFixedRate(statusUpdater, 1000,
-                                                                     5000, TimeUnit.MILLISECONDS);
+                5000, TimeUnit.MILLISECONDS);
         setPollInterval(1000);
         getSession().getSession().setMaxInactiveInterval(30);
         addDetachListener((DetachListener) detachEvent -> {
-             log.warn("Closing UI");
-             updaterThread.cancel(true);
+            log.warn("Closing UI");
+            updaterThread.cancel(true);
 
         });
 
@@ -115,20 +115,20 @@ public class GiftcardUI extends UI {
         submit.addClickListener(evt -> {
             submit.setEnabled(false);
             new BulkIssuer(commandGateway, Integer.parseInt(number.getValue()), Integer.parseInt(amount.getValue()),
-                bulkIssuer -> {
-                    access(() -> {
-                        if(bulkIssuer.getRemaining().get() == 0) {
-                            submit.setEnabled(true);
-                            panel.setCaption("Bulk issue cards");
-                            Notification.show("Bulk issue card completed", Notification.Type.HUMANIZED_MESSAGE)
-                                    .addCloseListener(e -> cardSummaryDataProvider.refreshAll());
-                        } else {
-                            panel.setCaption(String.format("Progress: %d suc, %d fail, %d rem", bulkIssuer.getSuccess().get(),
-                                    bulkIssuer.getError().get(), bulkIssuer.getRemaining().get()));
-                            cardSummaryDataProvider.refreshAll();
-                        }
+                    bulkIssuer -> {
+                        access(() -> {
+                            if (bulkIssuer.getRemaining().get() == 0) {
+                                submit.setEnabled(true);
+                                panel.setCaption("Bulk issue cards");
+                                Notification.show("Bulk issue card completed", Notification.Type.HUMANIZED_MESSAGE)
+                                        .addCloseListener(e -> cardSummaryDataProvider.refreshAll());
+                            } else {
+                                panel.setCaption(String.format("Progress: %d suc, %d fail, %d rem", bulkIssuer.getSuccess().get(),
+                                        bulkIssuer.getError().get(), bulkIssuer.getRemaining().get()));
+                                cardSummaryDataProvider.refreshAll();
+                            }
+                        });
                     });
-                });
         });
 
         FormLayout form = new FormLayout();
@@ -170,24 +170,25 @@ public class GiftcardUI extends UI {
         return grid;
     }
 
-    public class StatusUpdater implements Runnable {
+    class StatusUpdater implements Runnable {
         private final Label statusLabel;
-         private final ZoneOffset instantOffset;
+        private final ZoneOffset instantOffset;
 
-         public StatusUpdater(Label statusLabel, ZoneOffset instantOffset) {
-             this.statusLabel = statusLabel;
-             this.instantOffset = instantOffset;
-         }
+        public StatusUpdater(Label statusLabel, ZoneOffset instantOffset) {
+            this.statusLabel = statusLabel;
+            this.instantOffset = instantOffset;
+        }
 
-         @Override
-         public void run() {
-             CountCardSummariesQuery query = new CountCardSummariesQuery();
-             queryGateway.query(
-                     query, CountCardSummariesResponse.class).whenComplete((r, exception) -> {
-                 if( exception == null) statusLabel.setValue(Instant.ofEpochMilli(r.getLastEvent()).atOffset(instantOffset).toString());
-             });
+        @Override
+        public void run() {
+            CountCardSummariesQuery query = new CountCardSummariesQuery();
+            queryGateway.query(
+                    query, CountCardSummariesResponse.class).whenComplete((r, exception) -> {
+                if (exception == null)
+                    statusLabel.setValue(Instant.ofEpochMilli(r.getLastEvent()).atOffset(instantOffset).toString());
+            });
 
-         }
+        }
 
     }
 }

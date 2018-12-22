@@ -18,7 +18,7 @@ import java.util.List;
 @XSlf4j
 @RequiredArgsConstructor
 @Profile("query")
-public class CardSummaryProjection {
+class CardSummaryProjection {
 
     private final EntityManager entityManager;
     private final QueryUpdateEmitter queryUpdateEmitter;

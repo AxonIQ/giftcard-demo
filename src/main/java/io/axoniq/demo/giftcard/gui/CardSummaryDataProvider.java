@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 
 @XSlf4j
 @RequiredArgsConstructor
-public class CardSummaryDataProvider extends AbstractBackEndDataProvider<CardSummary, Void> {
+class CardSummaryDataProvider extends AbstractBackEndDataProvider<CardSummary, Void> {
 
     private static final ExecutorService executorService = Executors.newCachedThreadPool();
 

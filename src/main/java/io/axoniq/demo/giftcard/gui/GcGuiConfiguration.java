@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile("gui")
-public class GcGuiConfiguration {
+class GcGuiConfiguration {
 
 	@EventListener(ApplicationReadyEvent.class)
 	public void helloHub(ApplicationReadyEvent event) {
