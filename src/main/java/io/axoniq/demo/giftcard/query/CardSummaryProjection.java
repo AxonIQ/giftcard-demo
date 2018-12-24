@@ -24,7 +24,7 @@ class CardSummaryProjection {
     private final QueryUpdateEmitter queryUpdateEmitter;
 
     @EventHandler
-    public void on(IssuedEvt event) {
+    void on(IssuedEvt event) {
         log.trace("projecting {}", event);
         /*
          * Update our read model by inserting the new card. This is done so that upcoming regular
@@ -44,7 +44,7 @@ class CardSummaryProjection {
     }
 
     @EventHandler
-    public void on(RedeemedEvt event) {
+    void on(RedeemedEvt event) {
         log.trace("projecting {}", event);
         /*
          * Update our read model by updating the existing card. This is done so that upcoming regular
@@ -65,7 +65,7 @@ class CardSummaryProjection {
     }
 
     @QueryHandler
-    public List<CardSummary> handle(FetchCardSummariesQuery query) {
+    List<CardSummary> handle(FetchCardSummariesQuery query) {
         log.trace("handling {}", query);
         TypedQuery<CardSummary> jpaQuery = entityManager.createNamedQuery("CardSummary.fetch", CardSummary.class);
         jpaQuery.setParameter("idStartsWith", query.getFilter().getIdStartsWith());
@@ -75,7 +75,7 @@ class CardSummaryProjection {
     }
 
     @QueryHandler
-    public CountCardSummariesResponse handle(CountCardSummariesQuery query) {
+    CountCardSummariesResponse handle(CountCardSummariesQuery query) {
         log.trace("handling {}", query);
         TypedQuery<Long> jpaQuery = entityManager.createNamedQuery("CardSummary.count", Long.class);
         jpaQuery.setParameter("idStartsWith", query.getFilter().getIdStartsWith());

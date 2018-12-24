@@ -28,14 +28,14 @@ class GiftCard {
     }
 
     @CommandHandler
-    public GiftCard(IssueCmd cmd) {
+    GiftCard(IssueCmd cmd) {
         log.debug("handling {}", cmd);
         if(cmd.getAmount() <= 0) throw new IllegalArgumentException("amount <= 0");
         apply(new IssuedEvt(cmd.getId(), cmd.getAmount()));
     }
 
     @CommandHandler
-    public void handle(RedeemCmd cmd) {
+    void handle(RedeemCmd cmd) {
         log.debug("handling {}", cmd);
         if(cmd.getAmount() <= 0) throw new IllegalArgumentException("amount <= 0");
         if(cmd.getAmount() > remainingValue) throw new IllegalStateException("amount > remaining value");
@@ -43,13 +43,13 @@ class GiftCard {
     }
 
     @CommandHandler
-    public void handle(CancelCmd cmd) {
+    void handle(CancelCmd cmd) {
         log.debug("handling {}", cmd);
         apply(new CancelEvt(id));
     }
 
     @EventSourcingHandler
-    public void on(IssuedEvt evt) {
+    void on(IssuedEvt evt) {
         log.debug("applying {}", evt);
         id = evt.getId();
         remainingValue = evt.getAmount();
@@ -57,14 +57,14 @@ class GiftCard {
     }
 
     @EventSourcingHandler
-    public void on(RedeemedEvt evt) {
+    void on(RedeemedEvt evt) {
         log.debug("applying {}", evt);
         remainingValue -= evt.getAmount();
         log.debug("new remaining value: {}", remainingValue);
     }
 
     @EventSourcingHandler
-    public void on(CancelEvt evt) {
+    void on(CancelEvt evt) {
         log.debug("applying {}", evt);
         remainingValue = 0;
         log.debug("new remaining value: {}", remainingValue);

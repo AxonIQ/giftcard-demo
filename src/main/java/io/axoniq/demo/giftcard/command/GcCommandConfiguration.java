@@ -14,14 +14,14 @@ import org.springframework.stereotype.Component;
 class GcCommandConfiguration {
 
 	@Bean
-	public Repository<GiftCard> giftCardRepository(EventStore eventStore, Cache cache) {
+	Repository<GiftCard> giftCardRepository(EventStore eventStore, Cache cache) {
 		return EventSourcingRepository.builder(GiftCard.class)
 				.cache(cache).eventStore(eventStore)
 				.build();
 	}
 
 	@Bean
-    public Cache cache() {
+	Cache cache() {
 	    return new WeakReferenceCache();
 	}
 }

@@ -8,11 +8,11 @@ import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
 import org.junit.runner.RunWith;
 
 @RunWith(ArchUnitRunner.class)
-@AnalyzeClasses(packages = "io.axoniq.demo.giftcard")
-public class GcAppTest {
+@AnalyzeClasses(packagesOf=ArchitectureTest.class)
+public class ArchitectureTest {
 
     /**
-     * Testing if the classes in "..command.. , ..query.. " packages are package protected.
+     * Testing if the classes in "..command.. , ..query.. ,..qui..  " packages are package protected.
      * <p>
      * This will work with Java only. Kotlin does not have package modifier.
      */

@@ -174,7 +174,7 @@ class GiftcardUI extends UI {
         private final Label statusLabel;
         private final ZoneOffset instantOffset;
 
-        public StatusUpdater(Label statusLabel, ZoneOffset instantOffset) {
+        StatusUpdater(Label statusLabel, ZoneOffset instantOffset) {
             this.statusLabel = statusLabel;
             this.instantOffset = instantOffset;
         }

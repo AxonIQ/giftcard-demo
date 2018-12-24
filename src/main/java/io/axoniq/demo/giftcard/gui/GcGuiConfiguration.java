@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 class GcGuiConfiguration {
 
 	@EventListener(ApplicationReadyEvent.class)
-	public void helloHub(ApplicationReadyEvent event) {
+	void helloHub(ApplicationReadyEvent event) {
 		QueryGateway queryGateway = event.getApplicationContext().getBean(QueryGateway.class);
 		queryGateway.query(new CountCardSummariesQuery(),
 				ResponseTypes.instanceOf(CountCardSummariesResponse.class));

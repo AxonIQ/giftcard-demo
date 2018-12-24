@@ -1,7 +1,6 @@
 package io.axoniq.demo.giftcard.gui;
 
 import io.axoniq.demo.giftcard.api.IssueCmd;
-import com.vaadin.ui.UI;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,7 @@ class BulkIssuer {
     private final AtomicInteger error = new AtomicInteger();
     private final AtomicInteger remaining = new AtomicInteger();
 
-    public BulkIssuer(CommandGateway commandGateway, int number, int amount, Consumer<BulkIssuer> callback) {
+    BulkIssuer(CommandGateway commandGateway, int number, int amount, Consumer<BulkIssuer> callback) {
         remaining.set(number);
         new Thread(() -> {
             for(int i = 0; i < number; i++) {
@@ -50,15 +49,15 @@ class BulkIssuer {
         }).start();
     }
 
-    public AtomicInteger getSuccess() {
+    AtomicInteger getSuccess() {
         return success;
     }
 
-    public AtomicInteger getError() {
+    AtomicInteger getError() {
         return error;
     }
 
-    public AtomicInteger getRemaining() {
+    AtomicInteger getRemaining() {
         return remaining;
     }
 
