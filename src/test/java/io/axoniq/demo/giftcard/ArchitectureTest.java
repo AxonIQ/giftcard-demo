@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 public class ArchitectureTest {
 
     /**
-     * Testing if the classes in "..command.. , ..query.. ,..qui..  " packages are package protected.
+     * Testing if the classes in "..command.. , ..query.. ,..gui..  " packages are 'package private'.
      * <p>
      * This will work with Java only. Kotlin does not have package modifier.
      */
