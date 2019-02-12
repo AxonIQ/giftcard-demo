@@ -58,6 +58,20 @@
 			<version>${axon.version}</version>
 		</dependency>
 
+		<!-- Axon Tracing -->
+		<dependency>
+			<groupId>org.axonframework.extensions.tracing</groupId>
+			<artifactId>axon-tracing-spring-boot-starter</artifactId>
+			<version>4.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.opentracing.contrib</groupId>
+			<artifactId>opentracing-spring-jaeger-web-starter</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+
+
 		<!-- Vanilla Spring Boot to start with -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

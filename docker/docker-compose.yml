@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+
+  axonserver:
+    image: axoniq/axonserver
+    container_name: my-axon-server
+    ports:
+      - 8024:8024
+      - 8124:8124
+    networks:
+      - axonnet
+      - default
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.7
+    container_name: trading-engine-jaegertracing
+    ports:
+      - 16686:16686
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+    networks:
+      - axonnet
+      - default
+
+networks:
+  axonnet:
+    driver: bridge
