@@ -45,17 +45,17 @@ The simplest way to run the app is by using the Spring-boot maven plugin:
 ```
 mvnw spring-boot:run
 ```
-However, if you have copied the jar file `giftcard-distributed-1.0.jar` from the Maven `target` directory to some other location, you can also start it with:
+However, if you have copied the jar file `giftcard-demo-1.0.jar` from the Maven `target` directory to some other location, you can also start it with:
 
 ```
-java -jar giftcard-distributed-1.0.jar
+java -jar giftcard-demo-1.0.jar
 ```
 The Web GUI can be found at [`http://localhost:8080`](http://localhost:8080).
 
 If you want to activate only the `command` profile, use:
 
 ```
-java -Dspring.profiles.active=command giftcard-distributed-1.0.jar
+java -Dspring.profiles.active=command giftcard-demo-1.0.jar
 ```
 Idem for `query` and `gui`.
 
@@ -64,7 +64,7 @@ Idem for `query` and `gui`.
 To run the Giftcard app as if it were three seperate micro-services, use the Spring-boot `spring.profiles.active` option as follows:
 
 ```
-$ java -Dspring.profiles.active=command -jar giftcard-distributed-1.0.jar
+$ java -Dspring.profiles.active=command -jar giftcard-demo-1.0.jar
 ```
 This will start only the command part. To complete the app, open two other command shells, and start one with profile `query`, and the last one with `gui`. Again you can open the Web GUI at [`http://localhost:8080`](http://localhost:8080). The three parts of the application work together through the running instance of the Axon Server, which distributes the Commands, Queries, and Events.
 
