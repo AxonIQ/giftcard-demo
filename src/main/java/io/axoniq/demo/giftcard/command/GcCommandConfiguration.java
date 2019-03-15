@@ -13,15 +13,16 @@ import org.springframework.stereotype.Component;
 @Profile("command")
 public class GcCommandConfiguration {
 
-	@Bean
-	public Repository<GiftCard> giftCardRepository(EventStore eventStore, Cache cache) {
-		return EventSourcingRepository.builder(GiftCard.class)
-				.cache(cache).eventStore(eventStore)
-				.build();
-	}
+    @Bean
+    public Repository<GiftCard> giftCardRepository(EventStore eventStore, Cache cache) {
+        return EventSourcingRepository.builder(GiftCard.class)
+                                      .cache(cache)
+                                      .eventStore(eventStore)
+                                      .build();
+    }
 
-	@Bean
+    @Bean
     public Cache cache() {
-	    return new WeakReferenceCache();
-	}
+        return new WeakReferenceCache();
+    }
 }

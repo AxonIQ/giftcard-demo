@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.5.RELEASE</version>
+		<version>2.1.2.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -27,7 +27,7 @@
 
 		<maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
 
-		<axon.version>4.0.3</axon.version>
+		<axon.version>4.1</axon.version>
 
 		<vaadin.version>8.2.0</vaadin.version>
         <lombok.version>1.18.0</lombok.version>
@@ -56,6 +56,14 @@
 			<groupId>org.axonframework</groupId>
 			<artifactId>axon-spring-boot-starter</artifactId>
 			<version>${axon.version}</version>
+<!--
+			<exclusions>
+				<exclusion>
+					<groupId>org.axonframework</groupId>
+					<artifactId>axon-server-connector</artifactId>
+				</exclusion>
+			</exclusions>
+-->
 		</dependency>
 
 		<!-- Vanilla Spring Boot to start with -->
@@ -125,6 +133,19 @@
             <artifactId>jaxb-runtime</artifactId>
             <version>2.3.1</version>
         </dependency>
+		<dependency>
+			<groupId>org.axonframework</groupId>
+			<artifactId>axon-micrometer</artifactId>
+			<version>4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-actuator</artifactId>
+		</dependency>
 
 	</dependencies>
 
