@@ -1,0 +1,5 @@
+# Manifest file for PCF deployment
+
+applications:
+  - name: axon-giftcard
+    path: target/giftcard-demo-1.0.jar
