@@ -72,18 +72,6 @@
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
 
-		<!-- Spring Boot with JPA -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
 		<!-- This will of course be an Axon application. We're adding Kotlin to easily
 		     write command and event classes. -->
 		<dependency>
