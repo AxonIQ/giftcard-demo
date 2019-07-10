@@ -78,7 +78,7 @@ By default the Axon Framework is configured to expect a running Axon Server inst
 To run Axon Server locally, all you need to do is put the server JAR file in the directory where you want it to live, and start it using:
 
 ```
-java -jar axonserver-4.0-RC1.jar
+java -jar axonserver-4.1-6.jar
 ```
 
 You will see that it creates a subdirectory `data` where it will store its information.
