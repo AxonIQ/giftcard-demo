@@ -1,23 +1,25 @@
 package io.axoniq.demo.giftcard.query;
 
-import io.axoniq.demo.giftcard.api.*;
+import io.axoniq.demo.giftcard.api.CardSummary;
+import io.axoniq.demo.giftcard.api.CountCardSummariesQuery;
+import io.axoniq.demo.giftcard.api.CountCardSummariesResponse;
+import io.axoniq.demo.giftcard.api.CountChangedUpdate;
+import io.axoniq.demo.giftcard.api.FetchCardSummariesQuery;
+import io.axoniq.demo.giftcard.api.IssuedEvt;
+import io.axoniq.demo.giftcard.api.RedeemedEvt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import java.time.Instant;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
-@Component
 @XSlf4j
 @RequiredArgsConstructor
-@Profile("query")
 public class CardSummaryProjection {
 
     private final EntityManager entityManager;

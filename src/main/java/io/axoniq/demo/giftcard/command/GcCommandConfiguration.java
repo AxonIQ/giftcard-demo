@@ -5,15 +5,12 @@ import org.axonframework.common.caching.WeakReferenceCache;
 import org.axonframework.eventsourcing.EventSourcingRepository;
 import org.axonframework.eventsourcing.eventstore.EventStore;
 import org.axonframework.modelling.command.Repository;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
 
-@Component
-@Profile("command")
+import javax.enterprise.inject.Produces;
+
 public class GcCommandConfiguration {
 
-    @Bean
+    @Produces
     public Repository<GiftCard> giftCardRepository(EventStore eventStore, Cache cache) {
         return EventSourcingRepository.builder(GiftCard.class)
                                       .cache(cache)
@@ -21,7 +18,7 @@ public class GcCommandConfiguration {
                                       .build();
     }
 
-    @Bean
+    @Produces
     public Cache cache() {
         return new WeakReferenceCache();
     }

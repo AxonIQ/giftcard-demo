@@ -1,7 +1,6 @@
 package io.axoniq.demo.giftcard.gui;
 
 import io.axoniq.demo.giftcard.api.IssueCmd;
-import com.vaadin.ui.UI;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

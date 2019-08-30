@@ -19,7 +19,7 @@
 		<jee.version>8.0</jee.version>
 		<kotlin.version>1.3.40</kotlin.version>
 
-		<maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
+		<maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
 
 		<axon.version>4.2</axon.version>
 
@@ -77,10 +77,14 @@
 			<scope>provided</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-cdi</artifactId>
+		</dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-			<version>1.4.199</version>
+			<version>1.4.197</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -117,11 +121,13 @@
              -->
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
+			<version>3.2.5.RELEASE</version>
         </dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-ext</artifactId>
+			<version>1.7.25</version>
 		</dependency>
 
 		<!-- For Spring-boot, since Java 9-->

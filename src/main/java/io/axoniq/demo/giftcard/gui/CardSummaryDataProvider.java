@@ -3,8 +3,17 @@ package io.axoniq.demo.giftcard.gui;
 import com.vaadin.data.provider.AbstractBackEndDataProvider;
 import com.vaadin.data.provider.DataChangeEvent;
 import com.vaadin.data.provider.Query;
-import io.axoniq.demo.giftcard.api.*;
-import lombok.*;
+import io.axoniq.demo.giftcard.api.CardSummary;
+import io.axoniq.demo.giftcard.api.CardSummaryFilter;
+import io.axoniq.demo.giftcard.api.CountCardSummariesQuery;
+import io.axoniq.demo.giftcard.api.CountCardSummariesResponse;
+import io.axoniq.demo.giftcard.api.CountChangedUpdate;
+import io.axoniq.demo.giftcard.api.FetchCardSummariesQuery;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.Synchronized;
 import lombok.extern.slf4j.XSlf4j;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -58,8 +67,8 @@ public class CardSummaryDataProvider extends AbstractBackEndDataProvider<CardSum
          * a project reactor Mono for the initial response, and a Flux for the updates.
          */
         fetchQueryResult = queryGateway.subscriptionQuery(fetchCardSummariesQuery,
-                ResponseTypes.multipleInstancesOf(CardSummary.class),
-                ResponseTypes.instanceOf(CardSummary.class));
+                                                          ResponseTypes.multipleInstancesOf(CardSummary.class),
+                                                          ResponseTypes.instanceOf(CardSummary.class));
         /*
          * Subscribing to the updates before we get the initial results.
          */
@@ -85,8 +94,8 @@ public class CardSummaryDataProvider extends AbstractBackEndDataProvider<CardSum
         CountCardSummariesQuery countCardSummariesQuery = new CountCardSummariesQuery(filter);
         log.trace("submitting {}", countCardSummariesQuery);
         countQueryResult = queryGateway.subscriptionQuery(countCardSummariesQuery,
-                ResponseTypes.instanceOf(CountCardSummariesResponse.class),
-                ResponseTypes.instanceOf(CountChangedUpdate.class));
+                                                          ResponseTypes.instanceOf(CountCardSummariesResponse.class),
+                                                          ResponseTypes.instanceOf(CountChangedUpdate.class));
         /* When the count changes (new giftcards issued), the UI has to do an entirely new query (this is
          * how the Vaadin grid works). When we're bulk issuing, it doesn't make sense to do that on every single
          * issue event. Therefore, we buffer the updates for 250 milliseconds using reactor, and do the new
@@ -113,5 +122,4 @@ public class CardSummaryDataProvider extends AbstractBackEndDataProvider<CardSum
             countQueryResult = null;
         }
     }
-
 }
