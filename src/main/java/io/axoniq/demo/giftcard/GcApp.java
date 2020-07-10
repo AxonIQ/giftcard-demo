@@ -9,5 +9,4 @@ public class GcApp {
     public static void main(String[] args) {
         SpringApplication.run(GcApp.class, args);
     }
-
 }

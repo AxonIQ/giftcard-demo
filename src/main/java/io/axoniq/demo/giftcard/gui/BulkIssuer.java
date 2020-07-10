@@ -1,7 +1,6 @@
 package io.axoniq.demo.giftcard.gui;
 
 import io.axoniq.demo.giftcard.api.IssueCmd;
-import com.vaadin.ui.UI;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,7 @@ import java.util.function.Consumer;
 
 public class BulkIssuer {
 
-    private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final AtomicInteger success = new AtomicInteger();
     private final AtomicInteger error = new AtomicInteger();
@@ -22,16 +21,16 @@ public class BulkIssuer {
     public BulkIssuer(CommandGateway commandGateway, int number, int amount, Consumer<BulkIssuer> callback) {
         remaining.set(number);
         new Thread(() -> {
-            for(int i = 0; i < number; i++) {
+            for (int i = 0; i < number; i++) {
                 String id = UUID.randomUUID().toString().substring(0, 11).toUpperCase();
                 commandGateway
                         .send(new IssueCmd(id, amount))
                         .whenComplete((Object o, Throwable throwable) -> {
-                            if(throwable == null) {
+                            if (throwable == null) {
                                 success.incrementAndGet();
                             } else {
                                 error.incrementAndGet();
-                                log.error("Error handling command", throwable);
+                                logger.error("Error handling command", throwable);
                             }
                             remaining.decrementAndGet();
                         });
@@ -44,8 +43,8 @@ public class BulkIssuer {
                     Thread.sleep(1000);
                 }
                 callback.accept(this);
-            } catch(InterruptedException ex) {
-                log.error("Interrupted", ex);
+            } catch (InterruptedException ex) {
+                logger.error("Interrupted", ex);
             }
         }).start();
     }
@@ -61,6 +60,4 @@ public class BulkIssuer {
     public AtomicInteger getRemaining() {
         return remaining;
     }
-
-
 }

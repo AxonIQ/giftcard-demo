@@ -15,5 +15,4 @@ public class ProcessorConfig {
                 c -> TrackingEventProcessorConfiguration.forParallelProcessing(2)
         );
     }
-
 }

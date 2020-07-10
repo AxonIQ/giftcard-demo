@@ -1,6 +1,11 @@
 package io.axoniq.demo.giftcard.command;
 
-import io.axoniq.demo.giftcard.api.*;
+import io.axoniq.demo.giftcard.api.CancelCmd;
+import io.axoniq.demo.giftcard.api.CancelEvt;
+import io.axoniq.demo.giftcard.api.IssueCmd;
+import io.axoniq.demo.giftcard.api.IssuedEvt;
+import io.axoniq.demo.giftcard.api.RedeemCmd;
+import io.axoniq.demo.giftcard.api.RedeemedEvt;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -17,56 +22,63 @@ import static org.axonframework.modelling.command.AggregateLifecycle.apply;
 @Profile("command")
 public class GiftCard {
 
-    private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @AggregateIdentifier
-    private String id;
+    private String giftCardId;
     private int remainingValue;
-
-    public GiftCard() {
-        log.debug("empty constructor invoked");
-    }
 
     @CommandHandler
     public GiftCard(IssueCmd cmd) {
-        log.debug("handling {}", cmd);
-        if(cmd.getAmount() <= 0) throw new IllegalArgumentException("amount <= 0");
+        logger.debug("handling {}", cmd);
+        if (cmd.getAmount() <= 0) {
+            throw new IllegalArgumentException("amount <= 0");
+        }
         apply(new IssuedEvt(cmd.getId(), cmd.getAmount()));
     }
 
     @CommandHandler
     public void handle(RedeemCmd cmd) {
-        log.debug("handling {}", cmd);
-        if(cmd.getAmount() <= 0) throw new IllegalArgumentException("amount <= 0");
-        if(cmd.getAmount() > remainingValue) throw new IllegalStateException("amount > remaining value");
-        apply(new RedeemedEvt(id, cmd.getAmount()));
+        logger.debug("handling {}", cmd);
+        if (cmd.getAmount() <= 0) {
+            throw new IllegalArgumentException("amount <= 0");
+        }
+        if (cmd.getAmount() > remainingValue) {
+            throw new IllegalStateException("amount > remaining value");
+        }
+        apply(new RedeemedEvt(giftCardId, cmd.getAmount()));
     }
 
     @CommandHandler
     public void handle(CancelCmd cmd) {
-        log.debug("handling {}", cmd);
-        apply(new CancelEvt(id));
+        logger.debug("handling {}", cmd);
+        apply(new CancelEvt(giftCardId));
     }
 
     @EventSourcingHandler
     public void on(IssuedEvt evt) {
-        log.debug("applying {}", evt);
-        id = evt.getId();
+        logger.debug("applying {}", evt);
+        giftCardId = evt.getId();
         remainingValue = evt.getAmount();
-        log.debug("new remaining value: {}", remainingValue);
+        logger.debug("new remaining value: {}", remainingValue);
     }
 
     @EventSourcingHandler
     public void on(RedeemedEvt evt) {
-        log.debug("applying {}", evt);
+        logger.debug("applying {}", evt);
         remainingValue -= evt.getAmount();
-        log.debug("new remaining value: {}", remainingValue);
+        logger.debug("new remaining value: {}", remainingValue);
     }
 
     @EventSourcingHandler
     public void on(CancelEvt evt) {
-        log.debug("applying {}", evt);
+        logger.debug("applying {}", evt);
         remainingValue = 0;
-        log.debug("new remaining value: {}", remainingValue);
+        logger.debug("new remaining value: {}", remainingValue);
+    }
+
+    public GiftCard() {
+        // Required by Axon
+        logger.debug("Empty constructor invoked");
     }
 }

@@ -1,12 +1,26 @@
 package io.axoniq.demo.giftcard.gui;
 
-import com.vaadin.server.Page;
-import io.axoniq.demo.giftcard.api.*;
 import com.vaadin.annotations.Push;
 import com.vaadin.server.DefaultErrorHandler;
+import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Grid;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import io.axoniq.demo.giftcard.api.CardSummary;
+import io.axoniq.demo.giftcard.api.CountCardSummariesQuery;
+import io.axoniq.demo.giftcard.api.CountCardSummariesResponse;
+import io.axoniq.demo.giftcard.api.IssueCmd;
+import io.axoniq.demo.giftcard.api.RedeemCmd;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.slf4j.Logger;
@@ -25,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 @Profile("gui")
 public class GiftcardUI extends UI {
 
-    private final static Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final CommandGateway commandGateway;
     private final QueryGateway queryGateway;
@@ -63,8 +77,10 @@ public class GiftcardUI extends UI {
             @Override
             public void error(com.vaadin.server.ErrorEvent event) {
                 Throwable cause = event.getThrowable();
-                log.error("an error occured", cause);
-                while(cause.getCause() != null) cause = cause.getCause();
+                logger.error("an error occured", cause);
+                while (cause.getCause() != null) {
+                    cause = cause.getCause();
+                }
                 Notification.show("Error", cause.getMessage(), Notification.Type.ERROR_MESSAGE);
             }
         });
@@ -72,18 +88,16 @@ public class GiftcardUI extends UI {
         setPollInterval(1000);
         int offset = Page.getCurrent().getWebBrowser().getTimezoneOffset();
         // offset is in milliseconds
-             ZoneOffset instantOffset = ZoneOffset.ofTotalSeconds(offset/1000);
+        ZoneOffset instantOffset = ZoneOffset.ofTotalSeconds(offset / 1000);
         StatusUpdater statusUpdater = new StatusUpdater(statusLabel, instantOffset);
         updaterThread = Executors.newScheduledThreadPool(1).scheduleAtFixedRate(statusUpdater, 1000,
-                                                                     5000, TimeUnit.MILLISECONDS);
+                                                                                5000, TimeUnit.MILLISECONDS);
         setPollInterval(1000);
         getSession().getSession().setMaxInactiveInterval(30);
         addDetachListener((DetachListener) detachEvent -> {
-             log.warn("Closing UI");
-             updaterThread.cancel(true);
-
+            logger.warn("Closing UI");
+            updaterThread.cancel(true);
         });
-
     }
 
     private Panel issuePanel() {
@@ -94,7 +108,7 @@ public class GiftcardUI extends UI {
         submit.addClickListener(evt -> {
             commandGateway.sendAndWait(new IssueCmd(id.getValue(), Integer.parseInt(amount.getValue())));
             Notification.show("Success", Notification.Type.HUMANIZED_MESSAGE)
-                    .addCloseListener(e -> cardSummaryDataProvider.refreshAll());
+                        .addCloseListener(e -> cardSummaryDataProvider.refreshAll());
         });
 
         FormLayout form = new FormLayout();
@@ -115,20 +129,23 @@ public class GiftcardUI extends UI {
         submit.addClickListener(evt -> {
             submit.setEnabled(false);
             new BulkIssuer(commandGateway, Integer.parseInt(number.getValue()), Integer.parseInt(amount.getValue()),
-                bulkIssuer -> {
-                    access(() -> {
-                        if(bulkIssuer.getRemaining().get() == 0) {
-                            submit.setEnabled(true);
-                            panel.setCaption("Bulk issue cards");
-                            Notification.show("Bulk issue card completed", Notification.Type.HUMANIZED_MESSAGE)
-                                    .addCloseListener(e -> cardSummaryDataProvider.refreshAll());
-                        } else {
-                            panel.setCaption(String.format("Progress: %d suc, %d fail, %d rem", bulkIssuer.getSuccess().get(),
-                                    bulkIssuer.getError().get(), bulkIssuer.getRemaining().get()));
-                            cardSummaryDataProvider.refreshAll();
-                        }
-                    });
-                });
+                           bulkIssuer -> {
+                               access(() -> {
+                                   if (bulkIssuer.getRemaining().get() == 0) {
+                                       submit.setEnabled(true);
+                                       panel.setCaption("Bulk issue cards");
+                                       Notification.show("Bulk issue card completed",
+                                                         Notification.Type.HUMANIZED_MESSAGE)
+                                                   .addCloseListener(e -> cardSummaryDataProvider.refreshAll());
+                                   } else {
+                                       panel.setCaption(String.format("Progress: %d suc, %d fail, %d rem",
+                                                                      bulkIssuer.getSuccess().get(),
+                                                                      bulkIssuer.getError().get(),
+                                                                      bulkIssuer.getRemaining().get()));
+                                       cardSummaryDataProvider.refreshAll();
+                                   }
+                               });
+                           });
         });
 
         FormLayout form = new FormLayout();
@@ -147,7 +164,7 @@ public class GiftcardUI extends UI {
         submit.addClickListener(evt -> {
             commandGateway.sendAndWait(new RedeemCmd(id.getValue(), Integer.parseInt(amount.getValue())));
             Notification.show("Success", Notification.Type.HUMANIZED_MESSAGE)
-                    .addCloseListener(e -> cardSummaryDataProvider.refreshAll());
+                        .addCloseListener(e -> cardSummaryDataProvider.refreshAll());
         });
 
         FormLayout form = new FormLayout();
@@ -171,23 +188,25 @@ public class GiftcardUI extends UI {
     }
 
     public class StatusUpdater implements Runnable {
+
         private final Label statusLabel;
-         private final ZoneOffset instantOffset;
+        private final ZoneOffset instantOffset;
 
-         public StatusUpdater(Label statusLabel, ZoneOffset instantOffset) {
-             this.statusLabel = statusLabel;
-             this.instantOffset = instantOffset;
-         }
+        public StatusUpdater(Label statusLabel, ZoneOffset instantOffset) {
+            this.statusLabel = statusLabel;
+            this.instantOffset = instantOffset;
+        }
 
-         @Override
-         public void run() {
-             CountCardSummariesQuery query = new CountCardSummariesQuery();
-             queryGateway.query(
-                     query, CountCardSummariesResponse.class).whenComplete((r, exception) -> {
-                 if( exception == null) statusLabel.setValue(Instant.ofEpochMilli(r.getLastEvent()).atOffset(instantOffset).toString());
-             });
-
-         }
-
+        @Override
+        public void run() {
+            CountCardSummariesQuery query = new CountCardSummariesQuery();
+            queryGateway.query(
+                    query, CountCardSummariesResponse.class).whenComplete((r, exception) -> {
+                if (exception == null) {
+                    statusLabel.setValue(Instant.ofEpochMilli(r.getLastEvent())
+                                                .atOffset(instantOffset).toString());
+                }
+            });
+        }
     }
 }

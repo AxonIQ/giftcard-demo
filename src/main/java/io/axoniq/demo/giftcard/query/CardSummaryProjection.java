@@ -1,31 +1,43 @@
 package io.axoniq.demo.giftcard.query;
 
-import io.axoniq.demo.giftcard.api.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.XSlf4j;
+import io.axoniq.demo.giftcard.api.CardSummary;
+import io.axoniq.demo.giftcard.api.CountCardSummariesQuery;
+import io.axoniq.demo.giftcard.api.CountCardSummariesResponse;
+import io.axoniq.demo.giftcard.api.CountChangedUpdate;
+import io.axoniq.demo.giftcard.api.FetchCardSummariesQuery;
+import io.axoniq.demo.giftcard.api.IssuedEvt;
+import io.axoniq.demo.giftcard.api.RedeemedEvt;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import java.lang.invoke.MethodHandles;
 import java.time.Instant;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 @Component
-@XSlf4j
-@RequiredArgsConstructor
 @Profile("query")
 public class CardSummaryProjection {
+
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final EntityManager entityManager;
     private final QueryUpdateEmitter queryUpdateEmitter;
 
+    public CardSummaryProjection(EntityManager entityManager, QueryUpdateEmitter queryUpdateEmitter) {
+        this.entityManager = entityManager;
+        this.queryUpdateEmitter = queryUpdateEmitter;
+    }
+
     @EventHandler
     public void on(IssuedEvt event) {
-        log.trace("projecting {}", event);
+        logger.trace("projecting {}", event);
         /*
          * Update our read model by inserting the new card. This is done so that upcoming regular
          * (non-subscription) queries get correct data.
@@ -39,13 +51,13 @@ public class CardSummaryProjection {
          * - send a message that the count of queries matching this query has been changed.
          */
         queryUpdateEmitter.emit(CountCardSummariesQuery.class,
-                query -> event.getId().startsWith(query.getFilter().getIdStartsWith()),
-                new CountChangedUpdate());
+                                query -> event.getId().startsWith(query.getFilter().getIdStartsWith()),
+                                new CountChangedUpdate());
     }
 
     @EventHandler
     public void on(RedeemedEvt event) {
-        log.trace("projecting {}", event);
+        logger.trace("projecting {}", event);
         /*
          * Update our read model by updating the existing card. This is done so that upcoming regular
          * (non-subscription) queries get correct data.
@@ -60,26 +72,25 @@ public class CardSummaryProjection {
          * - send a message containing the new state of this gift card summary
          */
         queryUpdateEmitter.emit(FetchCardSummariesQuery.class,
-                query -> event.getId().startsWith(query.getFilter().getIdStartsWith()),
-                summary);
+                                query -> event.getId().startsWith(query.getFilter().getIdStartsWith()),
+                                summary);
     }
 
     @QueryHandler
     public List<CardSummary> handle(FetchCardSummariesQuery query) {
-        log.trace("handling {}", query);
+        logger.trace("handling {}", query);
         TypedQuery<CardSummary> jpaQuery = entityManager.createNamedQuery("CardSummary.fetch", CardSummary.class);
         jpaQuery.setParameter("idStartsWith", query.getFilter().getIdStartsWith());
         jpaQuery.setFirstResult(query.getOffset());
         jpaQuery.setMaxResults(query.getLimit());
-        return log.exit(jpaQuery.getResultList());
+        return jpaQuery.getResultList();
     }
 
     @QueryHandler
     public CountCardSummariesResponse handle(CountCardSummariesQuery query) {
-        log.trace("handling {}", query);
+        logger.trace("handling {}", query);
         TypedQuery<Long> jpaQuery = entityManager.createNamedQuery("CardSummary.count", Long.class);
         jpaQuery.setParameter("idStartsWith", query.getFilter().getIdStartsWith());
-        return log.exit(new CountCardSummariesResponse(jpaQuery.getSingleResult().intValue(), Instant.now().toEpochMilli()));
+        return new CountCardSummariesResponse(jpaQuery.getSingleResult().intValue(), Instant.now().toEpochMilli());
     }
-
 }
