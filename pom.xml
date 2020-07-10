@@ -6,7 +6,7 @@
 
     <groupId>io.axoniq.demo</groupId>
     <artifactId>giftcard-demo</artifactId>
-    <version>4.2</version>
+    <version>4.3.5</version>
     <packaging>jar</packaging>
 
     <name>giftcard-demo</name>
