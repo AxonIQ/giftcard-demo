@@ -1,0 +1,23 @@
+version: '3'
+services:
+  axonserver:
+    image: axoniq/axonserver
+    hostname: axonserver
+    ports:
+      - '8024:8024'
+      - '8124:8124'
+      - '8224:8224'
+  giftcard:
+    image: openjdk:11
+    working_dir: /giftcard
+    volumes:
+      - '../../../target/giftcard-volume/:/giftcard'
+      - '../../../src/test/resources/application.properties:/giftcard/application.properties'
+      - '../../../target/giftcard-demo-4.3.5.jar:/giftcard/giftcard-demo.jar'
+    links:
+      - 'axonserver'
+    environment:
+      - 'AXON_AXONSERVER_SERVERS=axonserver'
+      - 'SPRING_PROFILES_ACTIVE=query'
+      - 'SPRING_APPLICATION_NAME=gc-docker-query'
+    entrypoint: ['java', '-jar', 'giftcard-demo.jar']
