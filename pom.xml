@@ -6,7 +6,7 @@
 
     <groupId>io.axoniq.demo</groupId>
     <artifactId>giftcard-demo</artifactId>
-    <version>4.4</version>
+    <version>4.4.1</version>
     <packaging>jar</packaging>
 
     <name>giftcard-demo</name>
@@ -28,7 +28,7 @@
 
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
 
-        <axon.version>4.4</axon.version>
+        <axon.version>4.4.1</axon.version>
 
         <vaadin.version>8.2.0</vaadin.version>
         <lombok.version>1.18.0</lombok.version>
