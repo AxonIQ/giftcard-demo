@@ -28,7 +28,7 @@
 
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
 
-        <axon.version>4.4.3</axon.version>
+        <axon.version>4.4.4</axon.version>
 
         <vaadin.version>8.2.0</vaadin.version>
         <lombok.version>1.18.16</lombok.version>
