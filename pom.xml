@@ -30,7 +30,7 @@
 
         <axon.version>4.4.4</axon.version>
 
-        <vaadin.version>8.2.0</vaadin.version>
+        <vaadin.version>17.0.10</vaadin.version>
         <lombok.version>1.18.16</lombok.version>
     </properties>
 
