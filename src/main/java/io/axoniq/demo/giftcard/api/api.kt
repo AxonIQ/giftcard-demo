@@ -35,6 +35,10 @@ data class CardSummary(@Id var id: String, var initialValue: Int, var remainingV
         }
         return false
     }
+	
+	 override fun hashCode(): Int {
+        return 31
+    }
 }
 
 data class CardSummaryFilter(val idStartsWith: String = "")
