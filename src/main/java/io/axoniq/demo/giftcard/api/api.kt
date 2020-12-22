@@ -22,6 +22,19 @@ data class CancelEvt(val id: String)
                 query = "SELECT COUNT(c) FROM CardSummary c WHERE c.id LIKE CONCAT(:idStartsWith, '%')"))
 data class CardSummary(@Id var id: String, var initialValue: Int, var remainingValue: Int) {
     constructor() : this("", 0, 0)
+	override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
+        }
+        if (javaClass != other?.javaClass) {
+            return false
+        }
+        other as CardSummary
+        if (id == other.id) {
+            return true
+        }
+        return false
+    }
 }
 
 data class CardSummaryFilter(val idStartsWith: String = "")
