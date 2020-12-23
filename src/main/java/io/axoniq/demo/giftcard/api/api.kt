@@ -6,6 +6,7 @@ import javax.persistence.Entity
 import javax.persistence.Id
 import javax.persistence.NamedQueries
 import javax.persistence.NamedQuery
+import java.util.Objects
 
 data class IssueCmd(@TargetAggregateIdentifier val id: String, val amount: Int)
 data class IssuedEvt(val id: String, val amount: Int)
@@ -37,7 +38,7 @@ data class CardSummary(@Id var id: String, var initialValue: Int, var remainingV
     }
 	
 	 override fun hashCode(): Int {
-        return 31
+        return Objects.hash(id);
     }
 }
 
