@@ -31,7 +31,7 @@
         <axon.version>4.5</axon.version>
 
         <vaadin.version>8.2.0</vaadin.version>
-        <lombok.version>1.18.18</lombok.version>
+        <lombok.version>1.18.20</lombok.version>
     </properties>
 
     <dependencyManagement>
