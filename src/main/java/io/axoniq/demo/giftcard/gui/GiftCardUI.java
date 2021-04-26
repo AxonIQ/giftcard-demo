@@ -19,8 +19,8 @@ import com.vaadin.ui.VerticalLayout;
 import io.axoniq.demo.giftcard.api.CardSummary;
 import io.axoniq.demo.giftcard.api.CountCardSummariesQuery;
 import io.axoniq.demo.giftcard.api.CountCardSummariesResponse;
-import io.axoniq.demo.giftcard.api.IssueCmd;
-import io.axoniq.demo.giftcard.api.RedeemCmd;
+import io.axoniq.demo.giftcard.api.IssueCommand;
+import io.axoniq.demo.giftcard.api.RedeemCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.slf4j.Logger;
@@ -34,20 +34,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+@Profile("gui")
 @SpringUI
 @Push
-@Profile("gui")
-public class GiftcardUI extends UI {
+public class GiftCardUI extends UI {
 
     private final static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final CommandGateway commandGateway;
     private final QueryGateway queryGateway;
-
     private CardSummaryDataProvider cardSummaryDataProvider;
     private ScheduledFuture<?> updaterThread;
 
-    public GiftcardUI(CommandGateway commandGateway, QueryGateway queryGateway) {
+    public GiftCardUI(CommandGateway commandGateway, QueryGateway queryGateway) {
         this.commandGateway = commandGateway;
         this.queryGateway = queryGateway;
     }
@@ -58,7 +57,7 @@ public class GiftcardUI extends UI {
         commandBar.setWidth("100%");
         commandBar.addComponents(issuePanel(), bulkIssuePanel(), redeemPanel());
 
-        Grid summary = summaryGrid();
+        Grid<CardSummary> summary = summaryGrid();
 
         HorizontalLayout statusBar = new HorizontalLayout();
         Label statusLabel = new Label("Status");
@@ -77,7 +76,7 @@ public class GiftcardUI extends UI {
             @Override
             public void error(com.vaadin.server.ErrorEvent event) {
                 Throwable cause = event.getThrowable();
-                logger.error("an error occured", cause);
+                logger.error("An error occurred", cause);
                 while (cause.getCause() != null) {
                     cause = cause.getCause();
                 }
@@ -106,7 +105,7 @@ public class GiftcardUI extends UI {
         Button submit = new Button("Submit");
 
         submit.addClickListener(evt -> {
-            commandGateway.sendAndWait(new IssueCmd(id.getValue(), Integer.parseInt(amount.getValue())));
+            commandGateway.sendAndWait(new IssueCommand(id.getValue(), Integer.parseInt(amount.getValue())));
             Notification.show("Success", Notification.Type.HUMANIZED_MESSAGE)
                         .addCloseListener(e -> cardSummaryDataProvider.refreshAll());
         });
@@ -128,24 +127,27 @@ public class GiftcardUI extends UI {
 
         submit.addClickListener(evt -> {
             submit.setEnabled(false);
-            new BulkIssuer(commandGateway, Integer.parseInt(number.getValue()), Integer.parseInt(amount.getValue()),
-                           bulkIssuer -> {
-                               access(() -> {
-                                   if (bulkIssuer.getRemaining().get() == 0) {
-                                       submit.setEnabled(true);
-                                       panel.setCaption("Bulk issue cards");
-                                       Notification.show("Bulk issue card completed",
-                                                         Notification.Type.HUMANIZED_MESSAGE)
-                                                   .addCloseListener(e -> cardSummaryDataProvider.refreshAll());
-                                   } else {
-                                       panel.setCaption(String.format("Progress: %d suc, %d fail, %d rem",
-                                                                      bulkIssuer.getSuccess().get(),
-                                                                      bulkIssuer.getError().get(),
-                                                                      bulkIssuer.getRemaining().get()));
-                                       cardSummaryDataProvider.refreshAll();
-                                   }
-                               });
-                           });
+            new BulkIssuer(
+                    commandGateway,
+                    Integer.parseInt(number.getValue()),
+                    Integer.parseInt(amount.getValue()),
+                    bulkIssuer -> access(() -> {
+                        if (bulkIssuer.getRemaining().get() == 0) {
+                            submit.setEnabled(true);
+                            panel.setCaption("Bulk issue cards");
+                            Notification.show("Bulk issue card completed", Notification.Type.HUMANIZED_MESSAGE)
+                                        .addCloseListener(e -> cardSummaryDataProvider.refreshAll());
+                        } else {
+                            panel.setCaption(String.format(
+                                    "Progress: %d suc, %d fail, %d rem",
+                                    bulkIssuer.getSuccess().get(),
+                                    bulkIssuer.getError().get(),
+                                    bulkIssuer.getRemaining().get()
+                            ));
+                            cardSummaryDataProvider.refreshAll();
+                        }
+                    })
+            );
         });
 
         FormLayout form = new FormLayout();
@@ -162,7 +164,7 @@ public class GiftcardUI extends UI {
         Button submit = new Button("Submit");
 
         submit.addClickListener(evt -> {
-            commandGateway.sendAndWait(new RedeemCmd(id.getValue(), Integer.parseInt(amount.getValue())));
+            commandGateway.sendAndWait(new RedeemCommand(id.getValue(), Integer.parseInt(amount.getValue())));
             Notification.show("Success", Notification.Type.HUMANIZED_MESSAGE)
                         .addCloseListener(e -> cardSummaryDataProvider.refreshAll());
         });
@@ -176,7 +178,7 @@ public class GiftcardUI extends UI {
         return panel;
     }
 
-    private Grid summaryGrid() {
+    private Grid<CardSummary> summaryGrid() {
         cardSummaryDataProvider = new CardSummaryDataProvider(queryGateway);
         Grid<CardSummary> grid = new Grid<>();
         grid.addColumn(CardSummary::getId).setCaption("Card ID");
@@ -187,7 +189,7 @@ public class GiftcardUI extends UI {
         return grid;
     }
 
-    public class StatusUpdater implements Runnable {
+    private class StatusUpdater implements Runnable {
 
         private final Label statusLabel;
         private final ZoneOffset instantOffset;
@@ -199,14 +201,13 @@ public class GiftcardUI extends UI {
 
         @Override
         public void run() {
-            CountCardSummariesQuery query = new CountCardSummariesQuery();
-            queryGateway.query(
-                    query, CountCardSummariesResponse.class).whenComplete((r, exception) -> {
-                if (exception == null) {
-                    statusLabel.setValue(Instant.ofEpochMilli(r.getLastEvent())
-                                                .atOffset(instantOffset).toString());
-                }
-            });
+            queryGateway.query(new CountCardSummariesQuery(), CountCardSummariesResponse.class)
+                        .whenComplete((r, exception) -> {
+                            if (exception == null) {
+                                statusLabel.setValue(Instant.ofEpochMilli(r.getLastEvent())
+                                                            .atOffset(instantOffset).toString());
+                            }
+                        });
         }
     }
 }

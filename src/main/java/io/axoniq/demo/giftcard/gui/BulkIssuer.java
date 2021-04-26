@@ -1,6 +1,6 @@
 package io.axoniq.demo.giftcard.gui;
 
-import io.axoniq.demo.giftcard.api.IssueCmd;
+import io.axoniq.demo.giftcard.api.IssueCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,22 +18,23 @@ public class BulkIssuer {
     private final AtomicInteger error = new AtomicInteger();
     private final AtomicInteger remaining = new AtomicInteger();
 
-    public BulkIssuer(CommandGateway commandGateway, int number, int amount, Consumer<BulkIssuer> callback) {
+    public BulkIssuer(CommandGateway commandGateway,
+                      int number,
+                      int amount,
+                      Consumer<BulkIssuer> callback) {
         remaining.set(number);
         new Thread(() -> {
             for (int i = 0; i < number; i++) {
                 String id = UUID.randomUUID().toString().substring(0, 11).toUpperCase();
-                commandGateway
-                        .send(new IssueCmd(id, amount))
-                        .whenComplete((Object o, Throwable throwable) -> {
-                            if (throwable == null) {
-                                success.incrementAndGet();
-                            } else {
-                                error.incrementAndGet();
-                                logger.error("Error handling command", throwable);
-                            }
-                            remaining.decrementAndGet();
-                        });
+                commandGateway.send(new IssueCommand(id, amount))
+                              .whenComplete((Object result, Throwable throwable) -> {
+                                  if (throwable == null) {
+                                      success.incrementAndGet();
+                                  } else {
+                                      error.incrementAndGet();
+                                  }
+                                  remaining.decrementAndGet();
+                              });
             }
         }).start();
         new Thread(() -> {

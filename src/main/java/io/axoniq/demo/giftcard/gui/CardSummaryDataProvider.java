@@ -33,23 +33,21 @@ public class CardSummaryDataProvider extends AbstractBackEndDataProvider<CardSum
     private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
     private final QueryGateway queryGateway;
-
     /**
      * We need to keep track of our current subscriptions. To avoid subscriptions being modified while we are processing
      * query updates, the methods on these class are synchronized.
      */
     private SubscriptionQueryResult<List<CardSummary>, CardSummary> fetchQueryResult;
     private SubscriptionQueryResult<CountCardSummariesResponse, CountChangedUpdate> countQueryResult;
-
-    public CardSummaryDataProvider(QueryGateway queryGateway) {
-        this.queryGateway = queryGateway;
-    }
-
     @Getter
     @Setter
     @NonNull
     @SuppressWarnings("FieldMayBeFinal")
     private CardSummaryFilter filter = new CardSummaryFilter("");
+
+    public CardSummaryDataProvider(QueryGateway queryGateway) {
+        this.queryGateway = queryGateway;
+    }
 
     @Override
     @Synchronized
@@ -64,7 +62,6 @@ public class CardSummaryDataProvider extends AbstractBackEndDataProvider<CardSum
         }
         FetchCardSummariesQuery fetchCardSummariesQuery =
                 new FetchCardSummariesQuery(query.getOffset(), query.getLimit(), filter);
-        logger.trace("submitting {}", fetchCardSummariesQuery);
         /*
          * Submitting our query as a subscription query, specifying both the initially expected
          * response type (multiple CardSummaries) as wel as the expected type of the updates
@@ -97,7 +94,6 @@ public class CardSummaryDataProvider extends AbstractBackEndDataProvider<CardSum
             countQueryResult = null;
         }
         CountCardSummariesQuery countCardSummariesQuery = new CountCardSummariesQuery(filter);
-        logger.trace("submitting {}", countCardSummariesQuery);
         countQueryResult = queryGateway.subscriptionQuery(countCardSummariesQuery,
                                                           ResponseTypes.instanceOf(CountCardSummariesResponse.class),
                                                           ResponseTypes.instanceOf(CountChangedUpdate.class));

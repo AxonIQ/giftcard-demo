@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GcApp {
+public class GiftCardApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(GcApp.class, args);
+        SpringApplication.run(GiftCardApp.class, args);
     }
 }

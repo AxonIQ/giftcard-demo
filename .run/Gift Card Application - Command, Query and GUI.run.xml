@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Gift Card Application - Command, Query and GUI" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="giftcard-demo" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="io.axoniq.demo.giftcard.GiftCardApp" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <option name="SHORTEN_COMMAND_LINE" value="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
