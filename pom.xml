@@ -28,7 +28,7 @@
 
         <axon.version>4.5</axon.version>
 
-        <vaadin.version>8.2.0</vaadin.version>
+        <vaadin.version>19.0.8</vaadin.version>
         <lombok.version>1.18.20</lombok.version>
 
         <jaxb-runtime-version>3.0.0</jaxb-runtime-version>
