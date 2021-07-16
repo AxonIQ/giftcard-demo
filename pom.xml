@@ -26,7 +26,7 @@
         <java.version>11</java.version>
         <kotlin.version>1.5.10</kotlin.version>
 
-        <axon.version>4.5.1</axon.version>
+        <axon.version>4.5.3</axon.version>
 
         <vaadin.version>8.2.0</vaadin.version>
         <lombok.version>1.18.20</lombok.version>
