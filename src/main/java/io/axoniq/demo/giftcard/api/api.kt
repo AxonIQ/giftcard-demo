@@ -23,6 +23,11 @@ data class IssuedEvent(val id: String, val amount: Int)
 data class RedeemedEvent(@SubjectId val id: String, @SensitiveData(replacementValue = "hidden amount") val amount: Int)
 data class CancelEvent(val id: String)
 
+//Example event for data protection plugin config generation
+@SensitiveDataHolder //Only needs to be placed on the events, not on any contained objects such as the address in this example.
+data class ExampleEvent(@SubjectId val id: String, @SensitiveData val ssn: String, val address: Address)
+data class Address(@SensitiveData val addressLine1: String, val postalCode: String)
+
 // Queries
 
 data class CardSummaryFilter(val idStartsWith: String = "")

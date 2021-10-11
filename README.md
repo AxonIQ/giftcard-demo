@@ -233,3 +233,21 @@ There are a number of things you can finetune in the server configuration. You c
 Axon Server provides two servers; one serving HTTP requests, the other gRPC. By default these use ports 8024 and 8124 respectively, but you can change these in the settings.
 
 The HTTP server has in its root context a management Web GUI, a health indicator is available at `/actuator/health`, and the REST API at `/v1`. The API's Swagger endpoint finally, is available at `/swagger-ui.html`, and gives the documentation on the REST API.
+
+Data protection plugin
+-------------------
+The data protection plugin can serve as an alternative to the Data Protection Module commonly used inside Axon application.
+
+### Data protection plugin config generation
+The data protection maven plugin has been added to this project. It will automatically create a configuration output called `axon-data-protection-config.json` during the `compile` phase of the Maven Lifecycle. This output should be used for the configuration of the Data Protection Plugin on Axon Server.
+
+Since at this moment the `dataprotection-config-api` and `dataprotection-maven-plugin` do not have any releases available on public repositories, these two projects will first need to be run locally to install these dependencies. Their repositories can be found here:
+- https://github.com/AxonIQ/axon-dataprotection-config-api
+- https://github.com/AxonIQ/axon-dataprotection-maven-plugin/
+
+Two events have been included in the sample:
+- `RedeemedEvent`, an event used by the application
+- `ExampleEvent`, an unused event, but with a more complex data structure to show the `config-api` usage in more detail.
+
+### Using the data protection plugin in Axon Server
+...

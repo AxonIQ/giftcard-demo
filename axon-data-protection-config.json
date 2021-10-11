@@ -1,5 +1,18 @@
 {
   "config" : [ {
+    "type" : "io.axoniq.demo.giftcard.api.ExampleEvent",
+    "revision" : "",
+    "subjectId" : {
+      "path" : "$.id"
+    },
+    "sensitiveData" : [ {
+      "path" : "$.ssn",
+      "replacementValue" : ""
+    }, {
+      "path" : "$.address.addressLine1",
+      "replacementValue" : ""
+    } ]
+  }, {
     "type" : "io.axoniq.demo.giftcard.api.RedeemedEvent",
     "revision" : "",
     "subjectId" : {
