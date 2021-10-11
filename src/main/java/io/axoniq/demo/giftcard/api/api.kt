@@ -1,5 +1,8 @@
 package io.axoniq.demo.giftcard.api
 
+import io.axoniq.plugin.data.protection.annotation.SensitiveData
+import io.axoniq.plugin.data.protection.annotation.SensitiveDataHolder
+import io.axoniq.plugin.data.protection.annotation.SubjectId
 import org.axonframework.modelling.command.TargetAggregateIdentifier
 
 import javax.persistence.Entity
@@ -16,7 +19,8 @@ data class CancelCommand(@TargetAggregateIdentifier val id: String)
 // Events
 
 data class IssuedEvent(val id: String, val amount: Int)
-data class RedeemedEvent(val id: String, val amount: Int)
+@SensitiveDataHolder
+data class RedeemedEvent(@SubjectId val id: String, @SensitiveData(replacementValue = "hidden amount") val amount: Int)
 data class CancelEvent(val id: String)
 
 // Queries

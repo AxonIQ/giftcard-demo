@@ -1,0 +1,13 @@
+{
+  "config" : [ {
+    "type" : "io.axoniq.demo.giftcard.api.RedeemedEvent",
+    "revision" : "",
+    "subjectId" : {
+      "path" : "$.id"
+    },
+    "sensitiveData" : [ {
+      "path" : "$.amount",
+      "replacementValue" : "hidden amount"
+    } ]
+  } ]
+}

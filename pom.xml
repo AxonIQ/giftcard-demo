@@ -27,6 +27,9 @@
         <kotlin.version>1.5.10</kotlin.version>
 
         <axon.version>4.5.1</axon.version>
+        <dataprotection-config-api.version>1.0-SNAPSHOT</dataprotection-config-api.version>
+        <dataprotection-maven-plugin.version>1.0-SNAPSHOT</dataprotection-maven-plugin.version>
+
 
         <vaadin.version>8.2.0</vaadin.version>
         <lombok.version>1.18.20</lombok.version>
@@ -124,6 +127,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>io.axoniq</groupId>
+            <artifactId>axon-dataprotection-config-api</artifactId>
+            <version>${dataprotection-config-api.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -205,6 +215,27 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>io.axoniq</groupId>
+                <artifactId>axon-dataprotection-maven-plugin</artifactId>
+                <version>${dataprotection-maven-plugin.version}</version>
+                <configuration>
+                    <!-- required -->
+                    <packages>
+                        <package>io.axoniq.demo.giftcard.api</package>
+                    </packages>
+                    <!-- optional -->
+                    <outputConfig>axon-data-protection-config.json</outputConfig>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
