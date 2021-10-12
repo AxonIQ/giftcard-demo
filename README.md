@@ -250,4 +250,25 @@ Two events have been included in the sample:
 - `ExampleEvent`, an unused event, but with a more complex data structure to show the `config-api` usage in more detail.
 
 ### Using the data protection plugin in Axon Server
-...
+Use the axonserver-cli to upload and configure the data protection plugin (taken from https://docs.axoniq.io/reference-guide/axon-server/administration/plugins#plugin-administration)
+
+Upload the data protection plugin
+```
+java -jar axonserver-cli.jar upload-plugin -t $(cat ./axonserver.token) -f axon-server-plugin-data-protection-1.0-SNAPSHOT.jar -S https://localhost:8024 -i
+```
+
+Configure the plugin (https://docs.axoniq.io/reference-guide/axon-server/administration/plugins#configuring-a-plugin)
+- update the axon-data-protection-plugin-config.yaml file 
+  - set the vault configuration for your environment
+  - add the contents of the axon-data-protection-config.json file
+- run the following command to upload the configuration
+```
+java -jar ./axonserver-cli.jar configure-plugin -t $(cat ./axonserver.token) -p io.axoniq.axon-server-plugin-data-protection -v 1.0.0.SNAPSHOT -S https://localhost:8024 -i -c default -f axon-data-protection-config.yaml 
+```
+
+Activate the plugin for a context with the -c flag (https://docs.axoniq.io/reference-guide/axon-server/administration/plugins#activating-a-plugin)
+```
+java -jar ./axonserver-cli.jar activate-plugin -t $(cat ./axonserver.token) -p io.axoniq.axon-server-plugin-data-protection -v 1.0.0.SNAPSHOT -S https://localhost:8024 -i -c default
+```
+
+
