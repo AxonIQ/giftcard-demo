@@ -250,6 +250,9 @@ Two events have been included in the sample:
 - `ExampleEvent`, an unused event, but with a more complex data structure to show the `config-api` usage in more detail.
 
 ### Using the data protection plugin in Axon Server
+Running the docker-compose.yml file (rather than the kubernetes deployment) found in the docker directory will bring up an instance of axon server and and instance
+of vault to be able to run the example. 
+
 Use the axonserver-cli to upload and configure the data protection plugin (taken from https://docs.axoniq.io/reference-guide/axon-server/administration/plugins#plugin-administration)
 
 Upload the data protection plugin
@@ -259,7 +262,7 @@ java -jar axonserver-cli.jar upload-plugin -t $(cat ./axonserver.token) -f axon-
 
 Configure the plugin (https://docs.axoniq.io/reference-guide/axon-server/administration/plugins#configuring-a-plugin)
 - update the axon-data-protection-plugin-config.yaml file 
-  - set the vault configuration for your environment
+  - set the vault configuration for your environment  (if running the docker example, the vault token must match what is defined in the docker-compose file)
   - add the contents of the axon-data-protection-config.json file
 - run the following command to upload the configuration
 ```
