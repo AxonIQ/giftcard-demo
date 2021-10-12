@@ -254,7 +254,7 @@ Use the axonserver-cli to upload and configure the data protection plugin (taken
 
 Upload the data protection plugin
 ```
-java -jar axonserver-cli.jar upload-plugin -t $(cat ./axonserver.token) -f axon-server-plugin-data-protection-1.0-SNAPSHOT.jar -S https://localhost:8024 -i
+java -jar axonserver-cli.jar upload-plugin -t $(cat ./axonserver.token) -f axon-server-plugin-data-protection.jar -S https://localhost:8024 -i
 ```
 
 Configure the plugin (https://docs.axoniq.io/reference-guide/axon-server/administration/plugins#configuring-a-plugin)
