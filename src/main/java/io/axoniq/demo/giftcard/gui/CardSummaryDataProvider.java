@@ -4,14 +4,10 @@ import com.vaadin.data.provider.AbstractBackEndDataProvider;
 import com.vaadin.data.provider.DataChangeEvent;
 import com.vaadin.data.provider.Query;
 import io.axoniq.demo.giftcard.api.CardSummary;
-import io.axoniq.demo.giftcard.api.CardSummaryFilter;
 import io.axoniq.demo.giftcard.api.CountCardSummariesQuery;
 import io.axoniq.demo.giftcard.api.CountCardSummariesResponse;
 import io.axoniq.demo.giftcard.api.CountChangedUpdate;
 import io.axoniq.demo.giftcard.api.FetchCardSummariesQuery;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
 import lombok.Synchronized;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -39,11 +35,6 @@ public class CardSummaryDataProvider extends AbstractBackEndDataProvider<CardSum
      */
     private SubscriptionQueryResult<List<CardSummary>, CardSummary> fetchQueryResult;
     private SubscriptionQueryResult<CountCardSummariesResponse, CountChangedUpdate> countQueryResult;
-    @Getter
-    @Setter
-    @NonNull
-    @SuppressWarnings("FieldMayBeFinal")
-    private CardSummaryFilter filter = new CardSummaryFilter("");
 
     public CardSummaryDataProvider(QueryGateway queryGateway) {
         this.queryGateway = queryGateway;
@@ -61,7 +52,7 @@ public class CardSummaryDataProvider extends AbstractBackEndDataProvider<CardSum
             fetchQueryResult = null;
         }
         FetchCardSummariesQuery fetchCardSummariesQuery =
-                new FetchCardSummariesQuery(query.getOffset(), query.getLimit(), filter);
+                new FetchCardSummariesQuery(query.getOffset(), query.getLimit());
         /*
          * Submitting our query as a subscription query, specifying both the initially expected
          * response type (multiple CardSummaries) as wel as the expected type of the updates
@@ -83,7 +74,10 @@ public class CardSummaryDataProvider extends AbstractBackEndDataProvider<CardSum
         /*
          * Returning the initial result.
          */
-        return fetchQueryResult.initialResult().block().stream();
+        //noinspection ConstantConditions
+        return fetchQueryResult.initialResult()
+                               .block()
+                               .stream();
     }
 
     @Override
@@ -93,7 +87,7 @@ public class CardSummaryDataProvider extends AbstractBackEndDataProvider<CardSum
             countQueryResult.cancel();
             countQueryResult = null;
         }
-        CountCardSummariesQuery countCardSummariesQuery = new CountCardSummariesQuery(filter);
+        CountCardSummariesQuery countCardSummariesQuery = new CountCardSummariesQuery();
         countQueryResult = queryGateway.subscriptionQuery(countCardSummariesQuery,
                                                           ResponseTypes.instanceOf(CountCardSummariesResponse.class),
                                                           ResponseTypes.instanceOf(CountChangedUpdate.class));
@@ -108,9 +102,13 @@ public class CardSummaryDataProvider extends AbstractBackEndDataProvider<CardSum
                     /* This won't do, would lead to immediate new queries, looping a few times. */
                     executorService.execute(() -> fireEvent(new DataChangeEvent<>(this)));
                 });
-        return countQueryResult.initialResult().block().getCount();
+        //noinspection ConstantConditions
+        return countQueryResult.initialResult()
+                               .block()
+                               .getCount();
     }
 
+    @SuppressWarnings("unused")
     @Synchronized
     void shutDown() {
         if (fetchQueryResult != null) {

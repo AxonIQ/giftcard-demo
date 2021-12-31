@@ -1,6 +1,6 @@
 package io.axoniq.demo.giftcard.gui;
 
-import io.axoniq.demo.giftcard.api.IssueCommand;
+import io.axoniq.demo.giftcard.api.IssueCardCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class BulkIssuer {
         new Thread(() -> {
             for (int i = 0; i < number; i++) {
                 String id = UUID.randomUUID().toString().substring(0, 11).toUpperCase();
-                commandGateway.send(new IssueCommand(id, amount))
+                commandGateway.send(new IssueCardCommand(id, amount))
                               .whenComplete((Object result, Throwable throwable) -> {
                                   if (throwable == null) {
                                       success.incrementAndGet();

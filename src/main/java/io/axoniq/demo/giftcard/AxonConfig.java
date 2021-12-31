@@ -1,20 +1,13 @@
 package io.axoniq.demo.giftcard;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.axonframework.commandhandling.CommandBus;
+import com.thoughtworks.xstream.XStream;
 import org.axonframework.common.caching.Cache;
 import org.axonframework.common.caching.WeakReferenceCache;
-import org.axonframework.config.EventProcessingConfigurer;
-import org.axonframework.eventhandling.EventBus;
+import org.axonframework.config.Configurer;
+import org.axonframework.lifecycle.Phase;
 import org.axonframework.messaging.Message;
 import org.axonframework.messaging.interceptors.LoggingInterceptor;
-import org.axonframework.queryhandling.QueryBus;
-import org.axonframework.serialization.Serializer;
-import org.axonframework.serialization.json.JacksonSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -22,38 +15,40 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class AxonConfig {
 
-    @Bean
-    public LoggingInterceptor<Message<?>> loggingInterceptor() {
-        return new LoggingInterceptor<>();
-    }
-
     @Autowired
-    public void configureLoggingInterceptorFor(CommandBus commandBus,
-                                               LoggingInterceptor<Message<?>> loggingInterceptor) {
-        commandBus.registerDispatchInterceptor(loggingInterceptor);
-        commandBus.registerHandlerInterceptor(loggingInterceptor);
-    }
+    public void configureLoggingInterceptor(
+            @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") Configurer configurer
+    ) {
+        LoggingInterceptor<Message<?>> loggingInterceptor = new LoggingInterceptor<>();
 
-    @Autowired
-    public void configureLoggingInterceptorFor(EventBus eventBus, LoggingInterceptor<Message<?>> loggingInterceptor) {
-        eventBus.registerDispatchInterceptor(loggingInterceptor);
-    }
+        // Registers the LoggingInterceptor on all infrastructure once they've been initialized by the Configurer:
+        configurer.onInitialize(config -> {
+            config.onStart(Phase.INSTRUCTION_COMPONENTS + 1, () -> {
+                config.commandBus().registerHandlerInterceptor(loggingInterceptor);
+                config.commandBus().registerDispatchInterceptor(loggingInterceptor);
+                config.eventBus().registerDispatchInterceptor(loggingInterceptor);
+                config.queryBus().registerHandlerInterceptor(loggingInterceptor);
+                config.queryBus().registerDispatchInterceptor(loggingInterceptor);
+                config.queryUpdateEmitter().registerDispatchInterceptor(loggingInterceptor);
+            });
+        });
 
-    @Autowired
-    public void configureLoggingInterceptorFor(EventProcessingConfigurer eventProcessingConfigurer,
-                                               LoggingInterceptor<Message<?>> loggingInterceptor) {
-        eventProcessingConfigurer.registerDefaultHandlerInterceptor((config, processorName) -> loggingInterceptor);
-    }
-
-    @Autowired
-    public void configureLoggingInterceptorFor(QueryBus queryBus, LoggingInterceptor<Message<?>> loggingInterceptor) {
-        queryBus.registerDispatchInterceptor(loggingInterceptor);
-        queryBus.registerHandlerInterceptor(loggingInterceptor);
+        // Registers a default Handler Interceptor for all Event Processors:
+        configurer.eventProcessing()
+                  .registerDefaultHandlerInterceptor((config, processorName) -> loggingInterceptor);
     }
 
     @Bean
     @Profile("command")
     public Cache giftCardCache() {
         return new WeakReferenceCache();
+    }
+
+    // This ensures the XStream instance used is allowed to de-/serializer this demo's classes
+    @Bean
+    public XStream xStream() {
+        XStream xStream = new XStream();
+        xStream.allowTypesByWildcard(new String[]{"io.axoniq.demo.giftcard.**"});
+        return xStream;
     }
 }

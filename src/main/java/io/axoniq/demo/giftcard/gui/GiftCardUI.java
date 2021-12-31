@@ -19,8 +19,8 @@ import com.vaadin.ui.VerticalLayout;
 import io.axoniq.demo.giftcard.api.CardSummary;
 import io.axoniq.demo.giftcard.api.CountCardSummariesQuery;
 import io.axoniq.demo.giftcard.api.CountCardSummariesResponse;
-import io.axoniq.demo.giftcard.api.IssueCommand;
-import io.axoniq.demo.giftcard.api.RedeemCommand;
+import io.axoniq.demo.giftcard.api.IssueCardCommand;
+import io.axoniq.demo.giftcard.api.RedeemCardCommand;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.slf4j.Logger;
@@ -105,7 +105,7 @@ public class GiftCardUI extends UI {
         Button submit = new Button("Submit");
 
         submit.addClickListener(evt -> {
-            commandGateway.sendAndWait(new IssueCommand(id.getValue(), Integer.parseInt(amount.getValue())));
+            commandGateway.sendAndWait(new IssueCardCommand(id.getValue(), Integer.parseInt(amount.getValue())));
             Notification.show("Success", Notification.Type.HUMANIZED_MESSAGE)
                         .addCloseListener(e -> cardSummaryDataProvider.refreshAll());
         });
@@ -164,7 +164,7 @@ public class GiftCardUI extends UI {
         Button submit = new Button("Submit");
 
         submit.addClickListener(evt -> {
-            commandGateway.sendAndWait(new RedeemCommand(id.getValue(), Integer.parseInt(amount.getValue())));
+            commandGateway.sendAndWait(new RedeemCardCommand(id.getValue(), Integer.parseInt(amount.getValue())));
             Notification.show("Success", Notification.Type.HUMANIZED_MESSAGE)
                         .addCloseListener(e -> cardSummaryDataProvider.refreshAll());
         });

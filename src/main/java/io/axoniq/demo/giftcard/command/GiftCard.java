@@ -1,11 +1,11 @@
 package io.axoniq.demo.giftcard.command;
 
-import io.axoniq.demo.giftcard.api.CancelCommand;
-import io.axoniq.demo.giftcard.api.CancelEvent;
-import io.axoniq.demo.giftcard.api.IssueCommand;
-import io.axoniq.demo.giftcard.api.IssuedEvent;
-import io.axoniq.demo.giftcard.api.RedeemCommand;
-import io.axoniq.demo.giftcard.api.RedeemedEvent;
+import io.axoniq.demo.giftcard.api.CancelCardCommand;
+import io.axoniq.demo.giftcard.api.CardCanceledEvent;
+import io.axoniq.demo.giftcard.api.IssueCardCommand;
+import io.axoniq.demo.giftcard.api.CardIssuedEvent;
+import io.axoniq.demo.giftcard.api.RedeemCardCommand;
+import io.axoniq.demo.giftcard.api.CardRedeemedEvent;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -23,42 +23,42 @@ public class GiftCard {
     private int remainingValue;
 
     @CommandHandler
-    public GiftCard(IssueCommand command) {
+    public GiftCard(IssueCardCommand command) {
         if (command.getAmount() <= 0) {
             throw new IllegalArgumentException("amount <= 0");
         }
-        apply(new IssuedEvent(command.getId(), command.getAmount()));
+        apply(new CardIssuedEvent(command.getId(), command.getAmount()));
     }
 
     @CommandHandler
-    public void handle(RedeemCommand command) {
+    public void handle(RedeemCardCommand command) {
         if (command.getAmount() <= 0) {
             throw new IllegalArgumentException("amount <= 0");
         }
         if (command.getAmount() > remainingValue) {
             throw new IllegalStateException("amount > remaining value");
         }
-        apply(new RedeemedEvent(giftCardId, command.getAmount()));
+        apply(new CardRedeemedEvent(giftCardId, command.getAmount()));
     }
 
     @CommandHandler
-    public void handle(CancelCommand command) {
-        apply(new CancelEvent(giftCardId));
+    public void handle(CancelCardCommand command) {
+        apply(new CardCanceledEvent(giftCardId));
     }
 
     @EventSourcingHandler
-    public void on(IssuedEvent event) {
+    public void on(CardIssuedEvent event) {
         giftCardId = event.getId();
         remainingValue = event.getAmount();
     }
 
     @EventSourcingHandler
-    public void on(RedeemedEvent event) {
+    public void on(CardRedeemedEvent event) {
         remainingValue -= event.getAmount();
     }
 
     @EventSourcingHandler
-    public void on(CancelEvent event) {
+    public void on(CardCanceledEvent event) {
         remainingValue = 0;
     }
 
