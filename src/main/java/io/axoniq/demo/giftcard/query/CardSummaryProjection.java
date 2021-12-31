@@ -15,58 +15,58 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import java.util.Map;
 
 @Profile("query")
 @Service
 @ProcessingGroup("card-summary")
 public class CardSummaryProjection {
 
-    private final EntityManager entityManager;
+    private final Map<String, CardSummary> cardSummaryReadModel;
     private final QueryUpdateEmitter queryUpdateEmitter;
 
-    public CardSummaryProjection(EntityManager entityManager,
-                                 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") QueryUpdateEmitter queryUpdateEmitter) {
-        this.entityManager = entityManager;
+    public CardSummaryProjection(QueryUpdateEmitter queryUpdateEmitter) {
+        this.cardSummaryReadModel = new HashMap<>();
         this.queryUpdateEmitter = queryUpdateEmitter;
     }
 
-    /*
-     * Update our read model by inserting the new card. This is done so that upcoming regular
-     * (non-subscription) queries get correct data.
-     *
-     * Serve the subscribed queries by emitting an update. This reads as follows:
-     * - to all current subscriptions of type CountCardSummariesQuery
-     * - for which is true that the id of the gift card having been issued starts with the idStartWith string
-     *   in the query's filter
-     * - send a message that the count of queries matching this query has been changed.
-     */
     @EventHandler
     public void on(IssuedEvent event) {
-        entityManager.persist(new CardSummary(event.getId(), event.getAmount(), event.getAmount()));
-
+        /*
+         * Update our read model by inserting the new card. This is done so that upcoming regular
+         * (non-subscription) queries get correct data.
+         */
+        cardSummaryReadModel.put(event.getId(), new CardSummary(event.getId(), event.getAmount(), event.getAmount()));
+        /*
+         * Serve the subscribed queries by emitting an update. This reads as follows:
+         * - to all current subscriptions of type CountCardSummariesQuery
+         * - for which is true that the id of the gift card having been issued starts with the idStartWith string
+         *   in the query's filter
+         * - send a message that the count of queries matching this query has been changed.
+         */
         queryUpdateEmitter.emit(CountCardSummariesQuery.class,
                                 query -> event.getId().startsWith(query.getFilter().getIdStartsWith()),
                                 new CountChangedUpdate());
     }
 
-    /*
-     * Update our read model by updating the existing card. This is done so that upcoming regular
-     * (non-subscription) queries get correct data.
-     *
-     * Serve the subscribed queries by emitting an update. This reads as follows:
-     * - to all current subscriptions of type FetchCardSummariesQuery
-     * - for which is true that the id of the gift card having been redeemed starts with the idStartWith string
-     *   in the query's filter
-     * - send a message containing the new state of this gift card summary
-     */
     @EventHandler
     public void on(RedeemedEvent event) {
-        CardSummary summary = entityManager.find(CardSummary.class, event.getId());
+        /*
+         * Update our read model by updating the existing card. This is done so that upcoming regular
+         * (non-subscription) queries get correct data.
+         */
+        CardSummary summary = cardSummaryReadModel.get(event.getId());
         summary.setRemainingValue(summary.getRemainingValue() - event.getAmount());
-
+        /*
+         * Serve the subscribed queries by emitting an update. This reads as follows:
+         * - to all current subscriptions of type FetchCardSummariesQuery
+         * - for which is true that the id of the gift card having been redeemed starts with the idStartWith string
+         *   in the query's filter
+         * - send a message containing the new state of this gift card summary
+         */
         queryUpdateEmitter.emit(FetchCardSummariesQuery.class,
                                 query -> event.getId().startsWith(query.getFilter().getIdStartsWith()),
                                 summary);
@@ -75,18 +75,12 @@ public class CardSummaryProjection {
     @SuppressWarnings("unused")
     @QueryHandler
     public List<CardSummary> handle(FetchCardSummariesQuery query) {
-        TypedQuery<CardSummary> jpaQuery = entityManager.createNamedQuery("CardSummary.fetch", CardSummary.class);
-        jpaQuery.setParameter("idStartsWith", query.getFilter().getIdStartsWith());
-        jpaQuery.setFirstResult(query.getOffset());
-        jpaQuery.setMaxResults(query.getLimit());
-        return jpaQuery.getResultList();
+        return new ArrayList<>(cardSummaryReadModel.values());
     }
 
     @SuppressWarnings("unused")
     @QueryHandler
     public CountCardSummariesResponse handle(CountCardSummariesQuery query) {
-        TypedQuery<Long> jpaQuery = entityManager.createNamedQuery("CardSummary.count", Long.class);
-        jpaQuery.setParameter("idStartsWith", query.getFilter().getIdStartsWith());
-        return new CountCardSummariesResponse(jpaQuery.getSingleResult().intValue(), Instant.now().toEpochMilli());
+        return new CountCardSummariesResponse(cardSummaryReadModel.size(), Instant.now().toEpochMilli());
     }
 }
