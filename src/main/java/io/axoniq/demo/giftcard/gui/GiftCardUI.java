@@ -21,6 +21,8 @@ import io.axoniq.demo.giftcard.api.CountCardSummariesQuery;
 import io.axoniq.demo.giftcard.api.CountCardSummariesResponse;
 import io.axoniq.demo.giftcard.api.IssueCardCommand;
 import io.axoniq.demo.giftcard.api.RedeemCardCommand;
+import org.axonframework.axonserver.connector.ErrorCode;
+import org.axonframework.commandhandling.CommandExecutionException;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.queryhandling.QueryGateway;
 import org.slf4j.Logger;
@@ -105,7 +107,21 @@ public class GiftCardUI extends UI {
         Button submit = new Button("Submit");
 
         submit.addClickListener(evt -> {
-            commandGateway.sendAndWait(new IssueCardCommand(id.getValue(), Integer.parseInt(amount.getValue())));
+            try {
+                commandGateway.sendAndWait(new IssueCardCommand(id.getValue(), Integer.parseInt(amount.getValue())));
+            } catch (CommandExecutionException e) {
+                String message = e.getMessage();
+                if (message.contains(ErrorCode.INVALID_EVENT_SEQUENCE.errorCode())) {
+                    throw new IllegalStateException(
+                            "An event for aggregate [" + id.getValue() + "] at sequence ["
+                                    + message.substring(message.length() - 1) + "] was already inserted."
+                                    + "You are either reusing the aggregate identifier "
+                                    + "or concurrently dispatching commands for the same aggregate."
+                    );
+                } else {
+                    throw e;
+                }
+            }
             Notification.show("Success", Notification.Type.HUMANIZED_MESSAGE)
                         .addCloseListener(e -> cardSummaryDataProvider.refreshAll());
         });
