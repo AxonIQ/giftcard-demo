@@ -18,7 +18,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.stream.Collectors;
 
 @Profile("query")
@@ -32,7 +32,7 @@ public class CardSummaryProjection {
     public CardSummaryProjection(
             @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") QueryUpdateEmitter queryUpdateEmitter
     ) {
-        this.cardSummaryReadModel = new TreeMap<>();
+        this.cardSummaryReadModel = new ConcurrentSkipListMap<>();
         this.queryUpdateEmitter = queryUpdateEmitter;
     }
 
