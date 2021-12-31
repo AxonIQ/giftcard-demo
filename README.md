@@ -1,26 +1,34 @@
 Getting started with Axon
 =========================
 
-This Axon Framework demo application focuses around a simple giftcard domain, designed to show various aspects of the framework. The app can be run in various modes, using [Spring-boot Profiles](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-profiles.html): by selecting a specific profile, only the corresponding parts of the app will be active. Select none, and the default behaviour is activated, which activates everything. This way you can experiment with Axon in a (structured) monolith as well as in micro-services.
+This Axon Framework demo application focuses around a simple giftcard domain, designed to show various aspects of the framework. 
+The app can be run in various modes, using [Spring-boot Profiles](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-profiles.html): by selecting a specific profile, only the corresponding parts of the app will be active. 
+Select none, and the default behaviour is activated, which activates everything. 
+This way you can experiment with Axon in a (structured) monolith as well as in micro-services.
 
 Where to find more information:
 -------------------------------
 
 * The [Axon Reference Guide](https://docs.axoniq.io/reference-guide/) is definitive guide on the Axon Framework and Axon Server.
 * Visit [www.axoniq.io](https://www.axoniq.io) to find out about AxonIQ, the team behind the Axon Framework and Server.
-* Subscribe to the [AxonIQ Youtube channel](https://www.youtube.com/AxonIQ) to get the latest Webinars, announcements, and customer stories.
+* Subscribe to the [AxonIQ YouTube channel](https://www.youtube.com/AxonIQ) to get the latest Webinars, announcements, and customer stories.
+* To start a fresh Axon Application, you can go to [start.axoniq.io](https://start.axoniq.io/).
+* Additional information may be gained by following some of AxonIQ's courses on the [AxonIQ Academy](https://academy.axoniq.io/).
 * The latest version of the Giftcard App can be found [on GitHub](https://github.com/AxonIQ/giftcard-demo).
 * Docker images for Axon Server are pushed to [Docker Hub](https://hub.docker.com/u/axoniq).
+* If there are any Axon related questions remaining, you can always go to the [forum](https://discuss.axoniq.io/).
 
 The Giftcard app
 ----------------
 
 ### Background story
+
 See [the wikipedia article](https://en.wikipedia.org/wiki/Gift_card) for a basic definition of gift cards. Essentially, there are just two events in the life cycle of a gift card:
 * They get _issued_: a new gift card gets created with some amount of money stored.
 * They get _redeemed_: all or part of the monetary value stored on the gift card is used to purchase something.
 
 ### Structure of the App
+
 The Giftcard application is split into four parts, using four sub-packages of `io.axoniq.demo.giftcard`:
 * The `api` package contains the ([Kotlin](https://kotlinlang.org/)) sourcecode of the messages and entity. They form the API (sic) of the application.
 * The `command` package contains the GiftCard Aggregate class, with all command- and associated eventsourcing handlers.
@@ -30,12 +38,14 @@ The Giftcard application is split into four parts, using four sub-packages of `i
 Of these packages, `command`, `query`, and `gui` are also configured as profiles.
 
 ### Building the Giftcard app from the sources
+
 To build the demo app, simply run the provided [Maven wrapper](https://www.baeldung.com/maven-wrapper):
 
 ```
-mvnw clean package
+./mvnw clean package
 ```
-Note that for Mac OSX or Linux you probably have to add "`./`" in front of `mvnw`.
+
+Note that the Giftcard app expects JDK 11 to be used. 
 
 Running the Giftcard app
 ------------------------
@@ -43,7 +53,7 @@ Running the Giftcard app
 The simplest way to run the app is by using the Spring-boot maven plugin:
 
 ```
-mvnw spring-boot:run
+./mvnw spring-boot:run
 ```
 However, if you have copied the jar file `giftcard-demo-1.0.jar` from the Maven `target` directory to some other location, you can also start it with:
 
@@ -59,9 +69,9 @@ java -Dspring.profiles.active=command giftcard-demo-1.0.jar
 ```
 Idem for `query` and `gui`.
 
-### Running the Giftcard app as micro-services
+### Running the Giftcard app as microservices
 
-To run the Giftcard app as if it were three seperate micro-services, use the Spring-boot `spring.profiles.active` option as follows:
+To run the Giftcard app as if it were three separate microservices, use the Spring-boot `spring.profiles.active` option as follows:
 
 ```
 $ java -Dspring.profiles.active=command -jar giftcard-demo-1.0.jar
@@ -69,16 +79,26 @@ $ java -Dspring.profiles.active=command -jar giftcard-demo-1.0.jar
 This will start only the command part. To complete the app, open two other command shells, and start one with profile `query`, and the last one with `gui`. Again you can open the Web GUI at [`http://localhost:8080`](http://localhost:8080). The three parts of the application work together through the running instance of the Axon Server, which distributes the Commands, Queries, and Events.
 
 Running Axon Server
--------------------
+------------------
 
-By default the Axon Framework is configured to expect a running Axon Server instance, and it will complain if the server is not found. To run Axon Server, you'll need a Java runtime (JRE versions 8 through 10 are currently supported, Java 11 still has Spring-boot related growing-pains).  A copy of the server JAR file has been provided in the demo package. You can run it locally, in a Docker container (including Kubernetes or even Mini-kube), or on a separate server.
+By default, the Axon Framework is configured to expect a running Axon Server instance, and it will complain if the server is not found. 
+To run Axon Server, you'll need a Java runtime.  
+A copy of the server JAR file has been provided in the demo package. 
+You can run it locally, in a Docker container (including Kubernetes or even Mini-kube), or on a separate server.
+
+The section below give a fair description on how to run Axon Server for this sample project.
+If you are looking for more in depth information on the subject, we recommend this three-part blog series:
+
+1. [Running Axon Server - Going from local developer install to full-featured cluster in the cloud](https://axoniq.io/blog-overview/running-axon-server)
+2. [Running Axon Server in Docker - Continuing from local developer install to containerized](https://axoniq.io/blog-overview/running-axon-server-in-docker)
+3. [Running Axon Server in a Virtual Machine](https://axoniq.io/blog-overview/running-axon-server-in-a-virtual-machine)
 
 ### Running Axon Server locally
 
 To run Axon Server locally, all you need to do is put the server JAR file in the directory where you want it to live, and start it using:
 
 ```
-java -jar axonserver-4.1-6.jar
+java -jar axonserver-4.5-9.jar
 ```
 
 You will see that it creates a subdirectory `data` where it will store its information.
@@ -101,13 +121,17 @@ If you want to run the clients in Docker containers as well, and are not using s
 $ docker run -d --name my-axon-server -p 8024:8024 -p 8124:8124 --hostname axonserver -e AXONSERVER_HOSTNAME=axonserver axoniq/axonserver
 ```
 
-When you start the client containers, you can now use "`--link axonserver`" to provide them with the correct DNS entry. The Axon Server-connector looks at the "`axon.axonserver.servers`" property to determine where Axon Server lives, so don't forget to set it to "`axonserver`".
+When you start the client containers, you can now use "`--link axonserver`" to provide them with the correct DNS entry. 
+The Axon Server Connector looks at the "`axon.axonserver.servers`" property to determine where Axon Server lives, so don't forget to set it to "`axonserver`".
 
 ### Running Axon Server in Kubernetes and Mini-Kube
 
-*WARNING*: Although you can get a pretty functional cluster running locally using Mini-Kube, you can run into trouble when you want to let it serve clients outside of the cluster. Mini-Kube can provide access to HTTP servers running in the cluster, for other protocols you have to run a special protocol-agnostic proxy like you can with "`kubectl port-forward` _&lt;pod-name&gt;_ _&lt;port-number&gt;_". For non-development scenarios, we don't recommend using Mini-Kube.
+*WARNING*: Although you can get a pretty functional cluster running locally using Mini-Kube, you can run into trouble when you want to let it serve clients outside the cluster.
+Mini-Kube can provide access to HTTP servers running in the cluster, for other protocols you have to run a special protocol-agnostic proxy like you can with "`kubectl port-forward` _&lt;pod-name&gt;_ _&lt;port-number&gt;_". 
+Thus, for non-development scenarios, we don't recommend using Mini-Kube.
 
-Deployment requires the use of a YAML descriptor, an working example of which can be found in the "`kubernetes`" directory. To run it, use the following commands in a separate window:
+Deployment requires the use of a YAML descriptor, a working example of which can be found in the "`kubernetes`" directory. 
+To run it, use the following commands in a separate window:
 
 ```
 $ kubectl apply -f kubernetes/axonserver.yaml
@@ -119,7 +143,9 @@ Forwarding from 127.0.0.1:8124 -> 8124
 Forwarding from [::1]:8124 -> 8124
 ```
 
-You can now run the Giftcard app, which will connect throught the proxied gRPC port. To see the Axon Server Web GUI, use "`minikube service --url axonserver-gui`" to obtain the URL for your browser. Actually, if you leave out the "`--url`", minikube will open the the GUI in your default browser for you.
+You can now run the Giftcard app, which will connect through the proxied gRPC port. 
+To see the Axon Server Web GUI, use "`minikube service --url axonserver-gui`" to obtain the URL for your browser. 
+Actually, if you leave out the "`--url`", minikube will open the GUI in your default browser for you.
 
 To clean up the deployment, use:
 
@@ -163,23 +189,27 @@ kind: Service
 ...
 ```
 
-Use "`axonserver`" (as that is the name of the Kubernetes service) if you're going to deploy the client next to the server in the cluster, which is what you'ld probably want. Running the client outside the cluster, with Axon Server *inside*, entails extra work to enable and secure this, and is definitely beyond the scope of this example.
+Use "`axonserver`" (as that is the name of the Kubernetes service) if you're going to deploy the client next to the server in the cluster, which is what you'd probably want. 
+Running the client outside the cluster, with Axon Server *inside*, entails extra work to enable and secure this, and is definitely beyond the scope of this example.
 
 Configuring Axon Server
 -----------------------
 
-Axon Server uses sensible defaults for all of its settings, so it will actually run fine without any further configuration. However, if you want to make some changes, below are the most common options.
+Axon Server uses sensible defaults for all of its settings, so it will actually run fine without any further configuration.
+However, if you want to make some changes, below are the most common options.
+For an exhaustive list, we recommend checking out the [Configuration section](https://docs.axoniq.io/reference-guide/axon-server/administration/admin-configuration/configuration) of the Reference Guide.
 
 ### Environment variables for customizing the Docker image of Axon Server
 
-The `axoniq/axonserver` image can be customized at start by using one of the following environment variables. If no default is mentioned, leaving the environement variable unspecified will not add a line to the properties file.
+The `axoniq/axonserver` image can be customized at start by using one of the following environment variables. 
+If no default is mentioned, leaving the environment variable unspecified will not add a line to the properties file.
 
 * `AXONSERVER_NAME`
 
     This is the name the Axon Server uses for itself.
 * `AXONSERVER_HOSTNAME`
 
-    This is the hostname Axon Server communicates to the client as its contact point. Default is "`localhost`", because Docker generates a random name that is not resolvable outside of the container.
+    This is the hostname Axon Server communicates to the client as its contact point. Default is "`localhost`", because Docker generates a random name that is not resolvable outside the container.
 * `AXONSERVER_DOMAIN`
 
     This is the domain Axon Server can suffix the hostname with.
@@ -201,7 +231,8 @@ The `axoniq/axonserver` image can be customized at start by using one of the fol
 
 ### Axon Server configuration
 
-There are a number of things you can finetune in the server configuration. You can do this using an "`axonserver.properties`" file. All settings have sensible defaults.
+There are a number of things you can fine-tune in the server configuration. You can do this using an "`axonserver.properties`" file. 
+All settings have sensible defaults.
 
 * `axoniq.axonserver.name`
 
@@ -230,6 +261,8 @@ There are a number of things you can finetune in the server configuration. You c
 
 ### The Axon Server HTTP server
 
-Axon Server provides two servers; one serving HTTP requests, the other gRPC. By default these use ports 8024 and 8124 respectively, but you can change these in the settings.
+Axon Server provides two servers; one serving HTTP requests, the other gRPC. 
+By default, these use ports 8024 and 8124 respectively, but you can change these in the settings.
 
-The HTTP server has in its root context a management Web GUI, a health indicator is available at `/actuator/health`, and the REST API at `/v1`. The API's Swagger endpoint finally, is available at `/swagger-ui.html`, and gives the documentation on the REST API.
+The HTTP server has in its root context a management Web GUI, a health indicator is available at `/actuator/health`, and the REST API at `/v1`. 
+The API's Swagger endpoint finally, is available at `/swagger-ui.html`, and gives the documentation on the REST API.
