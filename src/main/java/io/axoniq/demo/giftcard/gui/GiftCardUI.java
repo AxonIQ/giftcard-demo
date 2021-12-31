@@ -94,7 +94,7 @@ public class GiftCardUI extends UI {
         setPollInterval(1000);
         getSession().getSession().setMaxInactiveInterval(30);
         addDetachListener((DetachListener) detachEvent -> {
-            logger.warn("Closing UI");
+            logger.info("Closing UI");
             updaterThread.cancel(true);
         });
     }
