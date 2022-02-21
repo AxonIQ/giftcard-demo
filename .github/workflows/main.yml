@@ -16,7 +16,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - java-version: 8
           - java-version: 11
           - java-version: 17
       fail-fast: false
