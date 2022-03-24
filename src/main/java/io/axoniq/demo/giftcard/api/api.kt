@@ -4,6 +4,7 @@ import io.axoniq.plugin.data.protection.annotation.SensitiveData
 import io.axoniq.plugin.data.protection.annotation.SensitiveDataHolder
 import io.axoniq.plugin.data.protection.annotation.SubjectId
 import org.axonframework.modelling.command.TargetAggregateIdentifier
+import org.axonframework.serialization.Revision
 
 import javax.persistence.Entity
 import javax.persistence.Id
@@ -25,6 +26,7 @@ data class CancelEvent(val id: String)
 
 //Example event for data protection plugin config generation
 @SensitiveDataHolder //Only needs to be placed on the events, not on any contained objects such as the address in this example.
+@Revision("1")
 data class ExampleEvent(@SubjectId val id: String, @SensitiveData val ssn: String, val address: Address)
 data class Address(@SensitiveData val addressLine1: String, val postalCode: String)
 
