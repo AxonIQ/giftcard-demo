@@ -28,6 +28,9 @@
 
         <axon.version>4.5.12</axon.version>
 
+        <dataprotection-config-api.version>1.0-SNAPSHOT</dataprotection-config-api.version>
+        <dataprotection-maven-plugin.version>1.0-SNAPSHOT</dataprotection-maven-plugin.version>
+
         <vaadin.version>8.14.3</vaadin.version>
         <lombok.version>1.18.22</lombok.version>
 
@@ -149,6 +152,11 @@
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
             </exclusions>
+        <dependency>
+            <groupId>io.axoniq</groupId>
+            <artifactId>axon-dataprotection-config-api</artifactId>
+            <version>${dataprotection-config-api.version}</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -232,6 +240,27 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>io.axoniq</groupId>
+                <artifactId>axon-dataprotection-maven-plugin</artifactId>
+                <version>${dataprotection-maven-plugin.version}</version>
+                <configuration>
+                    <!-- required -->
+                    <packages>
+                        <package>io.axoniq.demo.giftcard.api</package>
+                    </packages>
+                    <!-- optional -->
+                    <outputConfig>axon-data-protection-config.json</outputConfig>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

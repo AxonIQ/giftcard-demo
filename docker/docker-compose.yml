@@ -1,0 +1,27 @@
+version: '3.3'
+services:
+  axonserver:
+    image: axoniq/axonserver:latest
+    hostname: axonserver
+    environment:
+      - SPRING_SERVLET_MULTIPART_MAX-FILE-SIZE=35MB
+      - SPRING_SERVLET_MULTIPART_MAX-REQUEST-SIZE=35MB
+      - AXONIQ_AXONSERVER_DEVMODE_ENABLED=TRUE
+    ports:
+      - '8024:8024'
+      - '8124:8124'
+    networks:
+      - axon-server-plugin-data-protection
+
+  vault:
+    image: vault:latest
+    hostname: vault
+    ports:
+      - '8200:8200'
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=localVaultToken
+    networks:
+      - axon-server-plugin-data-protection
+
+networks:
+  axon-server-plugin-data-protection:

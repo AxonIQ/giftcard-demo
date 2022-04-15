@@ -266,3 +266,44 @@ By default, these use ports 8024 and 8124 respectively, but you can change these
 
 The HTTP server has in its root context a management Web GUI, a health indicator is available at `/actuator/health`, and the REST API at `/v1`. 
 The API's Swagger endpoint finally, is available at `/swagger-ui.html`, and gives the documentation on the REST API.
+
+Data protection plugin
+-------------------
+The data protection plugin can serve as an alternative to the Data Protection Module commonly used inside Axon application.
+
+### Data protection plugin config generation
+The data protection maven plugin has been added to this project. It will automatically create a configuration output called `axon-data-protection-config.json` during the `compile` phase of the Maven Lifecycle. This output should be used for the configuration of the Data Protection Plugin on Axon Server.
+
+Since at this moment the `dataprotection-config-api` and `dataprotection-maven-plugin` do not have any releases available on public repositories, these two projects will first need to be run locally to install these dependencies. Their repositories can be found here:
+- https://github.com/AxonIQ/axon-dataprotection-config-api
+- https://github.com/AxonIQ/axon-dataprotection-maven-plugin/
+
+Two events have been included in the sample:
+- `RedeemedEvent`, an event used by the application
+- `ExampleEvent`, an unused event, but with a more complex data structure to show the `config-api` usage in more detail.
+
+### Using the data protection plugin in Axon Server
+Running the docker-compose.yml file (rather than the kubernetes deployment) found in the docker directory will bring up an instance of axon server and and instance
+of vault to be able to run the example. 
+
+Use the axonserver-cli to upload and configure the data protection plugin (taken from https://docs.axoniq.io/reference-guide/axon-server/administration/plugins#plugin-administration)
+
+Upload the data protection plugin
+```
+java -jar axonserver-cli.jar upload-plugin -t $(cat ./axonserver.token) -f axon-server-plugin-data-protection.jar -S https://localhost:8024 -i
+```
+
+Configure the plugin (https://docs.axoniq.io/reference-guide/axon-server/administration/plugins#configuring-a-plugin)
+- update the axon-data-protection-plugin-config.yaml file 
+  - set the vault configuration for your environment  (if running the docker example, the vault token must match what is defined in the docker-compose file)
+  - add the contents of the axon-data-protection-config.json file
+- run the following command to upload the configuration
+```
+java -jar ./axonserver-cli.jar configure-plugin -t $(cat ./axonserver.token) -p io.axoniq.axon-server-plugin-data-protection -v 1.0.0.SNAPSHOT -S https://localhost:8024 -i -c default -f axon-data-protection-config.yaml 
+```
+
+Activate the plugin for a context with the -c flag (https://docs.axoniq.io/reference-guide/axon-server/administration/plugins#activating-a-plugin)
+```
+java -jar ./axonserver-cli.jar activate-plugin -t $(cat ./axonserver.token) -p io.axoniq.axon-server-plugin-data-protection -v 1.0.0.SNAPSHOT -S https://localhost:8024 -i -c default
+```
+

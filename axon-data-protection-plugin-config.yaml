@@ -1,0 +1,6 @@
+Vault configuration:
+  address: http://somevaultserver:9430
+  token: token4context
+  prefix: prefix4context
+MetaModel configuration:
+  metamodel: 'paste raw json contents of axon-data-protection-config.json here'
