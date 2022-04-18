@@ -29,7 +29,7 @@
         <axon.version>4.5.12</axon.version>
 
         <dataprotection-config-api.version>1.0-SNAPSHOT</dataprotection-config-api.version>
-        <dataprotection-maven-plugin.version>1.0-SNAPSHOT</dataprotection-maven-plugin.version>
+        <dataprotection-maven-plugin.version>1.0</dataprotection-maven-plugin.version>
 
         <vaadin.version>8.14.3</vaadin.version>
         <lombok.version>1.18.22</lombok.version>
