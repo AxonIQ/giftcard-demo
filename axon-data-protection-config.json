@@ -1,5 +1,15 @@
 {
   "config" : [ {
+    "type" : "io.axoniq.demo.giftcard.api.CardRedeemedEvent",
+    "revision" : "",
+    "subjectId" : {
+      "path" : "$.id"
+    },
+    "sensitiveData" : [ {
+      "path" : "$.amount",
+      "replacementValue" : "hidden amount"
+    } ]
+  }, {
     "type" : "io.axoniq.demo.giftcard.api.ExampleEvent",
     "revision" : "1",
     "subjectId" : {
@@ -11,16 +21,6 @@
     }, {
       "path" : "$.address.addressLine1",
       "replacementValue" : ""
-    } ]
-  }, {
-    "type" : "io.axoniq.demo.giftcard.api.RedeemedEvent",
-    "revision" : "",
-    "subjectId" : {
-      "path" : "$.id"
-    },
-    "sensitiveData" : [ {
-      "path" : "$.amount",
-      "replacementValue" : "hidden amount"
     } ]
   } ]
 }

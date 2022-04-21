@@ -14,7 +14,7 @@ data class CancelCardCommand(@TargetAggregateIdentifier val id: String)
 // Events
 data class CardIssuedEvent(val id: String, val amount: Int)
 @SensitiveDataHolder
-data class CardRedeemedEvent(val id: String, @SensitiveData(replacementValue = "hidden amount") val amount: Int)
+data class CardRedeemedEvent(@SubjectId val id: String, @SensitiveData(replacementValue = "hidden amount") val amount: Int)
 data class CardCanceledEvent(val id: String)
 
 //Example event for data protection plugin config generation
