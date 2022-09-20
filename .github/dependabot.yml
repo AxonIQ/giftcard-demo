@@ -9,7 +9,7 @@ updates:
     - "Type: Dependency Upgrade"
     - "Priority 1: Must"
     - "Status: In Progress"
-  milestone: 1
+  milestone: 2
   reviewers:
     - "saratry"
     - "YvonneCeelie"
@@ -23,7 +23,7 @@ updates:
     - "Type: Dependency Upgrade"
     - "Priority 1: Must"
     - "Status: In Progress"
-  milestone: 1
+  milestone: 2
   reviewers:
     - "saratry"
     - "YvonneCeelie"
