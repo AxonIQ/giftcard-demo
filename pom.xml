@@ -26,7 +26,7 @@
         <java.version>11</java.version>
         <kotlin.version>1.8.10</kotlin.version>
 
-        <axon.version>4.6.3</axon.version>
+        <axon.version>4.7.0</axon.version>
 
         <dataprotection-config-api.version>1.0</dataprotection-config-api.version>
         <dataprotection-maven-plugin.version>1.0</dataprotection-maven-plugin.version>

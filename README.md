@@ -98,7 +98,7 @@ If you are looking for more in depth information on the subject, we recommend th
 To run Axon Server locally, all you need to do is put the server JAR file in the directory where you want it to live, and start it using:
 
 ```
-java -jar axonserver-4.5-9.jar
+java -jar axonserver.jar
 ```
 
 You will see that it creates a subdirectory `data` where it will store its information.
