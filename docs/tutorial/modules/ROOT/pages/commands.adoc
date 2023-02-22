@@ -1,0 +1,28 @@
+= Commands
+
+TODO
+
+== Command Definition
+
+[source,kotlin]
+----
+include::example$src/main/java/io/axoniq/demo/giftcard/api/api.kt[tag=commands]
+----
+
+== Command handlers
+
+=== Issue Card
+
+
+[source,java]
+----
+include::example$src/main/java/io/axoniq/demo/giftcard/command/GiftCard.java[tag=IssueCardCommandHandler]
+----
+
+=== Redeem Card
+
+
+[source,java]
+----
+include::example$src/main/java/io/axoniq/demo/giftcard/command/GiftCard.java[tag=RedeemCardCommandHandler]
+----

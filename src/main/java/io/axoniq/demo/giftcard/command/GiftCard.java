@@ -22,6 +22,7 @@ public class GiftCard {
     private String giftCardId;
     private int remainingValue;
 
+    // tag::IssueCardCommandHandler[]
     @CommandHandler
     public GiftCard(IssueCardCommand command) {
         if (command.amount() <= 0) {
@@ -29,7 +30,9 @@ public class GiftCard {
         }
         apply(new CardIssuedEvent(command.id(), command.amount()));
     }
+    // end::IssueCardCommandHandler[]
 
+    // tag::RedeemCardCommandHandler[]
     @CommandHandler
     public void handle(RedeemCardCommand command) {
         if (command.amount() <= 0) {
@@ -40,6 +43,7 @@ public class GiftCard {
         }
         apply(new CardRedeemedEvent(giftCardId, command.amount()));
     }
+    // end::RedeemCardCommandHandler[]
 
     @SuppressWarnings("unused")
     @CommandHandler

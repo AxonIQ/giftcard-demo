@@ -1,0 +1,5 @@
+= Introduction
+:navtitle: Axon Framework - from design to deployment
+:reftext: {navtitle}
+
+Building a new application can be a daunting task. This section of the documentation will help you with the various phases of development, walking you through the capabilities of Axon Framework and providing tips and tricks along the way. At the end, you will have an application "in production" and will have made changes after the initial release as well.
