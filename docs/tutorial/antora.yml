@@ -1,10 +1,10 @@
 name: giftcard
-title: Axon Framework - from design to deployment
-version: 4.6
+title: Building a Giftcard Application
+version: true
 
 asciidoc:
   attributes:
-    component_description: Designing, building and deploying Axon Framework applications
+    component_description: Getting started with designing, building and deploying Axon applications
     type: tutorial
     group: beginner
 

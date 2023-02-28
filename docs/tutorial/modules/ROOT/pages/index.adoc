@@ -1,5 +1,7 @@
 = Introduction
-:navtitle: Axon Framework - from design to deployment
-:reftext: {navtitle}
+:navtitle: Introduction
+:reftext: Building a Giftcard Application
 
-Building a new application can be a daunting task. This section of the documentation will help you with the various phases of development, walking you through the capabilities of Axon Framework and providing tips and tricks along the way. At the end, you will have an application "in production" and will have made changes after the initial release as well.
+Building a new application can be a daunting task. This tutorial walks you trough the various phases of development, explains the capabilities of Axon Framework and provides useful tips and tricks along the way.
+
+The result is a simple application you deploy in "production". Then the tutorial teaches you how to evolve the application, make changes and deploy those in different scenarios.

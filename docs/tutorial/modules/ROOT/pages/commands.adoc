@@ -2,7 +2,7 @@
 
 TODO
 
-== Command Definition
+== Command definition
 
 [source,kotlin]
 ----
@@ -11,7 +11,7 @@ include::example$src/main/java/io/axoniq/demo/giftcard/api/api.kt[tag=commands]
 
 == Command handlers
 
-=== Issue Card
+=== Issue card
 
 
 [source,java]
@@ -19,7 +19,7 @@ include::example$src/main/java/io/axoniq/demo/giftcard/api/api.kt[tag=commands]
 include::example$src/main/java/io/axoniq/demo/giftcard/command/GiftCard.java[tag=IssueCardCommandHandler]
 ----
 
-=== Redeem Card
+=== Redeem card
 
 
 [source,java]
