@@ -45,7 +45,7 @@ To build the demo app, simply run the provided [Maven wrapper](https://www.baeld
 ./mvnw clean package
 ```
 
-Note that the Giftcard app expects JDK 11 to be used. 
+Note that the Giftcard app expects JDK 17 to be used. 
 
 Running the Giftcard app
 ------------------------
