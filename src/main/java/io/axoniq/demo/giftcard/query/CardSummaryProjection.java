@@ -1,12 +1,12 @@
 package io.axoniq.demo.giftcard.query;
 
-import io.axoniq.demo.giftcard.api.CardIssuedEvent;
-import io.axoniq.demo.giftcard.api.CardRedeemedEvent;
-import io.axoniq.demo.giftcard.api.CardSummary;
-import io.axoniq.demo.giftcard.api.CountCardSummariesQuery;
-import io.axoniq.demo.giftcard.api.CountCardSummariesResponse;
-import io.axoniq.demo.giftcard.api.CountChangedUpdate;
-import io.axoniq.demo.giftcard.api.FetchCardSummariesQuery;
+import io.axoniq.demo.giftcard.api.event.CardIssuedEvent;
+import io.axoniq.demo.giftcard.api.event.CardRedeemedEvent;
+import io.axoniq.demo.giftcard.api.query.CardSummary;
+import io.axoniq.demo.giftcard.api.query.CountCardSummariesQuery;
+import io.axoniq.demo.giftcard.api.query.CountCardSummariesResponse;
+import io.axoniq.demo.giftcard.api.query.CountChangedUpdate;
+import io.axoniq.demo.giftcard.api.query.FetchCardSummariesQuery;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
@@ -30,7 +30,7 @@ public class CardSummaryProjection {
     private final QueryUpdateEmitter queryUpdateEmitter;
 
     public CardSummaryProjection(
-            @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") QueryUpdateEmitter queryUpdateEmitter
+            QueryUpdateEmitter queryUpdateEmitter
     ) {
         this.cardSummaryReadModel = new ConcurrentSkipListMap<>();
         this.queryUpdateEmitter = queryUpdateEmitter;
@@ -42,7 +42,7 @@ public class CardSummaryProjection {
          * Update our read model by inserting the new card. This is done so that upcoming regular
          * (non-subscription) queries get correct data.
          */
-        cardSummaryReadModel.put(event.getId(), new CardSummary(event.getId(), event.getAmount(), event.getAmount()));
+        cardSummaryReadModel.put(event.id(), new CardSummary(event.id(), event.amount(), event.amount()));
         /*
          * Serve the subscribed queries by emitting an update. This reads as follows:
          * - to all current subscriptions of type CountCardSummariesQuery,
@@ -58,8 +58,9 @@ public class CardSummaryProjection {
          * Update our read model by updating the existing card. This is done so that upcoming regular
          * (non-subscription) queries get correct data.
          */
-        CardSummary summary = cardSummaryReadModel.get(event.getId());
-        summary.setRemainingValue(summary.getRemainingValue() - event.getAmount());
+        CardSummary summary = cardSummaryReadModel.computeIfPresent(
+                event.id(), (id, card) -> card.redeem(event.amount())
+        );
         /*
          * Serve the subscribed queries by emitting an update. This reads as follows:
          * - to all current subscriptions of type FetchCardSummariesQuery
@@ -73,8 +74,8 @@ public class CardSummaryProjection {
     public List<CardSummary> handle(FetchCardSummariesQuery query) {
         CardSummary[] cardSummaryArray = cardSummaryReadModel.values()
                                                              .toArray(CardSummary[]::new);
-        return Arrays.stream(cardSummaryArray, query.getOffset(), cardSummaryArray.length)
-                     .limit(query.getLimit())
+        return Arrays.stream(cardSummaryArray, query.offset(), cardSummaryArray.length)
+                     .limit(query.limit())
                      .collect(Collectors.toList());
     }
 
