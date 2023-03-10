@@ -1,12 +1,12 @@
 package io.axoniq.demo.giftcard.query;
 
-import io.axoniq.demo.giftcard.api.CardIssuedEvent;
-import io.axoniq.demo.giftcard.api.CardRedeemedEvent;
-import io.axoniq.demo.giftcard.api.CardSummary;
-import io.axoniq.demo.giftcard.api.CountCardSummariesQuery;
-import io.axoniq.demo.giftcard.api.CountCardSummariesResponse;
-import io.axoniq.demo.giftcard.api.CountChangedUpdate;
-import io.axoniq.demo.giftcard.api.FetchCardSummariesQuery;
+import io.axoniq.demo.giftcard.api.event.CardIssuedEvent;
+import io.axoniq.demo.giftcard.api.event.CardRedeemedEvent;
+import io.axoniq.demo.giftcard.api.query.CardSummary;
+import io.axoniq.demo.giftcard.api.query.CountCardSummariesQuery;
+import io.axoniq.demo.giftcard.api.query.CountCardSummariesResponse;
+import io.axoniq.demo.giftcard.api.query.CountChangedUpdate;
+import io.axoniq.demo.giftcard.api.query.FetchCardSummariesQuery;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
 import org.junit.jupiter.api.*;
 
@@ -38,9 +38,9 @@ class CardSummaryProjectionTest {
         List<CardSummary> results = testSubject.handle(new FetchCardSummariesQuery(0, 100));
         assertEquals(1, results.size());
         CardSummary result = results.get(0);
-        assertEquals(testId, result.getId());
-        assertEquals(testAmount, result.getInitialValue());
-        assertEquals(testAmount, result.getRemainingValue());
+        assertEquals(testId, result.id());
+        assertEquals(testAmount, result.initialValue());
+        assertEquals(testAmount, result.remainingValue());
 
         verify(updateEmitter).emit(eq(CountCardSummariesQuery.class), any(), isA(CountChangedUpdate.class));
     }
@@ -57,9 +57,9 @@ class CardSummaryProjectionTest {
         List<CardSummary> results = testSubject.handle(new FetchCardSummariesQuery(0, 100));
         assertEquals(1, results.size());
         CardSummary result = results.get(0);
-        assertEquals(testId, result.getId());
-        assertEquals(testAmount, result.getInitialValue());
-        assertEquals(testAmount - testRedeemAmount, result.getRemainingValue());
+        assertEquals(testId, result.id());
+        assertEquals(testAmount, result.initialValue());
+        assertEquals(testAmount - testRedeemAmount, result.remainingValue());
 
         verify(updateEmitter).emit(eq(FetchCardSummariesQuery.class), any(), eq(result));
     }
@@ -78,14 +78,14 @@ class CardSummaryProjectionTest {
         assertEquals(2, results.size());
 
         CardSummary firstResult = results.get(0);
-        assertEquals(testId, firstResult.getId());
-        assertEquals(testAmount, firstResult.getInitialValue());
-        assertEquals(testAmount, firstResult.getRemainingValue());
+        assertEquals(testId, firstResult.id());
+        assertEquals(testAmount, firstResult.initialValue());
+        assertEquals(testAmount, firstResult.remainingValue());
 
         CardSummary secondResult = results.get(1);
-        assertEquals(otherTestId, secondResult.getId());
-        assertEquals(otherTestAmount, secondResult.getInitialValue());
-        assertEquals(otherTestAmount, secondResult.getRemainingValue());
+        assertEquals(otherTestId, secondResult.id());
+        assertEquals(otherTestAmount, secondResult.initialValue());
+        assertEquals(otherTestAmount, secondResult.remainingValue());
     }
 
     @Test
@@ -100,9 +100,9 @@ class CardSummaryProjectionTest {
         List<CardSummary> results = testSubject.handle(new FetchCardSummariesQuery(0, 1));
         assertEquals(1, results.size());
         CardSummary result = results.get(0);
-        assertEquals(testId, result.getId());
-        assertEquals(testAmount, result.getInitialValue());
-        assertEquals(testAmount, result.getRemainingValue());
+        assertEquals(testId, result.id());
+        assertEquals(testAmount, result.initialValue());
+        assertEquals(testAmount, result.remainingValue());
     }
 
     @Test
@@ -117,9 +117,9 @@ class CardSummaryProjectionTest {
         List<CardSummary> results = testSubject.handle(new FetchCardSummariesQuery(1, 1));
         assertEquals(1, results.size());
         CardSummary result = results.get(0);
-        assertEquals(testId, result.getId());
-        assertEquals(testAmount, result.getInitialValue());
-        assertEquals(testAmount, result.getRemainingValue());
+        assertEquals(testId, result.id());
+        assertEquals(testAmount, result.initialValue());
+        assertEquals(testAmount, result.remainingValue());
     }
 
     @Test
@@ -129,6 +129,6 @@ class CardSummaryProjectionTest {
                  .forEach(i -> testSubject.on(new CardIssuedEvent(UUID.randomUUID().toString(), i)));
 
         CountCardSummariesResponse result = testSubject.handle(new CountCardSummariesQuery());
-        assertEquals(expectedCount, result.getCount());
+        assertEquals(expectedCount, result.count());
     }
 }
