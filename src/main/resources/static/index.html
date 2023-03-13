@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Giftcard Demo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script type="text/javascript" async="" src="app.js"></script>
+</head>
+<body>
+<section class="section">
+    <h1 class="title">
+        Giftcard Demo
+    </h1>
+    <div class="container">
+        <div class="columns">
+            <div class="column has-background-white-ter m-2">
+                <h3 class="subtitle">Issue single card</h3>
+                <label class="label">Card Id<input class="input" id="id-input-issue" type="text"
+                                                   placeholder="9F70EAA6-9B"></label>
+                <label class="label">Amount<input class="input" id="amount-input-issue" type="number" placeholder="50"></label>
+                <button class="button" disabled id="issue-button">Submit</button>
+            </div>
+            <div class="column has-background-white-ter m-2">
+                <h3 class="subtitle">Bulk issue cards</h3>
+                <label class="label">Number<input class="input" id="number-input-bulk" type="number"
+                                                  placeholder="10"></label>
+                <label class="label">Amount<input class="input" id="amount-input-bulk" type="number"
+                                                  placeholder="50"></label>
+                <button class="button" disabled id="bulk-button">Submit</button>
+            </div>
+            <div class="column has-background-white-ter m-2">
+                <h3 class="subtitle">Redeem card</h3>
+                <label class="label">Card id<input class="input" id="id-input-redeem" type="text"
+                                                   placeholder="82AE84C4-C0"></label>
+                <label class="label">Amount<input class="input" id="amount-input-redeem" type="number" placeholder="12"></label>
+                <button class="button" disabled id="redeem-button">Submit</button>
+            </div>
+        </div>
+        <div class="notification is-success" id="notification" style="visibility: hidden">
+            <button class="delete" id="notification-button"></button>
+            <p id="notification-text"></p>
+        </div>
+    </div>
+    <div class="container">
+        <h2 class="subtitle">
+            Latest updated cards
+        </h2>
+        <table class="table is-bordered is-striped is-fullwidth">
+            <thead>
+            <tr>
+                <th>Card ID</th>
+                <th>Initial value</th>
+                <th>Remaining value</th>
+                <th>Issued at</th>
+                <th>Last updated</th>
+            </tr>
+            </thead>
+            <tbody id="table-body">
+            </tbody>
+        </table>
+    </div>
+    <div class="container mt-3">
+        <div class="columns">
+            <div class="column is-three-quarters">
+                <div class="notification">In total
+                    <div id="count" class="is-inline-block">0</div>
+                    cards issued, last one at:
+                    <div id="last-event" class="is-inline-block">not yet</div>.
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="label">Maximum cards shown</label>
+                    <div class="control">
+                        <div class="select" id="table-size-select">
+                            <select>
+                                <option>20</option>
+                                <option>50</option>
+                                <option>100</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            <div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

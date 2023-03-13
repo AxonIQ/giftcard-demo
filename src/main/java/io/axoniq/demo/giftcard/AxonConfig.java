@@ -32,14 +32,6 @@ public class AxonConfig {
         return new WeakReferenceCache();
     }
 
-    // This ensures the XStream instance used is allowed to de-/serializer this demo's classes
-    @Bean
-    public XStream xStream() {
-        XStream xStream = new XStream();
-        xStream.allowTypesByWildcard(new String[]{"io.axoniq.demo.giftcard.**"});
-        return xStream;
-    }
-
     /**
      * An example {@link ConfigurerModule} implementation to attach configuration to Axon's configuration life cycle.
      */

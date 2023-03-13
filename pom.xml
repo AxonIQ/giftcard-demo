@@ -26,7 +26,7 @@
         <java.version>17</java.version>
         <kotlin.version>1.8.10</kotlin.version>
 
-        <axon.version>4.7.1</axon.version>
+        <axon.version>4.7.2</axon.version>
 
         <dataprotection-config-api.version>1.0</dataprotection-config-api.version>
         <dataprotection-maven-plugin.version>1.0</dataprotection-maven-plugin.version>
@@ -51,13 +51,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>vaadin-bom</artifactId>
-                <version>${vaadin.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -74,27 +67,14 @@
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
 
-        <!-- Vaadin for the GUI -->
         <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-spring-boot-starter</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/com.vaadin/vaadin-classic-components-flow -->
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-classic-components-flow</artifactId>
-            <version>24.0.0</version>
-        </dependency>
-
 
         <!-- Messaging dependencies -->
         <dependency>
-            <!--
-               reactor-core is needed for subscription queries
-               when using Spring Boot 2.0, you'll automatically get reactor-core 3.1, which is fine
-               if you're on Spring Boot 1.5, you would get 2.x, which doesn't work, so you would have to manually set version 3.1
-             -->
+            <!-- The version is provided by the Axon bom. It's needed for subscription queries-->
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
         </dependency>
