@@ -41,6 +41,7 @@ public class GiftCard {
         apply(new CardRedeemedEvent(giftCardId, command.amount()));
     }
 
+    @SuppressWarnings("unused")
     @CommandHandler
     public void handle(CancelCardCommand command) {
         apply(new CardCanceledEvent(giftCardId));

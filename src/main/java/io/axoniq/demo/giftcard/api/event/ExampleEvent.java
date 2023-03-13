@@ -7,11 +7,13 @@ import org.axonframework.serialization.Revision;
 
 /**
  * Example event for data protection plugin config generation
+ *
  * @param id
  * @param ssn
  * @param address
  */
-@SensitiveDataHolder //Only needs to be placed on the events, not on any contained objects such as the address in this example.
+@SensitiveDataHolder
+//Only needs to be placed on the events, not on any contained objects such as the address in this example.
 @Revision("1")
 public record ExampleEvent(
         @SubjectId String id,
