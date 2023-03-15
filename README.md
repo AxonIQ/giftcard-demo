@@ -30,12 +30,12 @@ See [the wikipedia article](https://en.wikipedia.org/wiki/Gift_card) for a basic
 ### Structure of the App
 
 The Giftcard application is split into four parts, using four sub-packages of `io.axoniq.demo.giftcard`:
-* The `api` package contains the ([Kotlin](https://kotlinlang.org/)) sourcecode of the messages and entity. They form the API (sic) of the application.
+* The `api` package contains the ([Java Records](https://www.baeldung.com/java-record-keyword)) sourcecode of the messages and entity. They form the API (sic) of the application.
 * The `command` package contains the GiftCard Aggregate class, with all command- and associated eventsourcing handlers.
 * The `query` package provides the query handlers, with their associated event handlers.
-* The `gui` package contains the [Vaadin](https://vaadin.com/)-based Web GUI.
+* The `rest` package contains the [Spring Webflux](https://www.baeldung.com/spring-webflux)-based Web API.
 
-Of these packages, `command`, `query`, and `gui` are also configured as profiles.
+Of these packages, `command`, `query`, and `gui` (enabling the `rest` package) are also configured as profiles.
 
 ### Building the Giftcard app from the sources
 
@@ -77,6 +77,7 @@ To run the Giftcard app as if it were three separate microservices, use the Spri
 $ java -Dspring.profiles.active=command -jar giftcard-demo-1.0.jar
 ```
 This will start only the command part. To complete the app, open two other command shells, and start one with profile `query`, and the last one with `gui`. Again you can open the Web GUI at [`http://localhost:8080`](http://localhost:8080). The three parts of the application work together through the running instance of the Axon Server, which distributes the Commands, Queries, and Events.
+It's also possible to explore the REST API using [Swagger](http://localhost:8080/webjars/swagger-ui/index.html) or get the [Open Api definition](http://localhost:8080/v3/api-docs) to create a client.
 
 Running Axon Server
 ------------------
