@@ -24,17 +24,13 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <java.version>17</java.version>
-        <kotlin.version>1.8.10</kotlin.version>
 
         <axon.version>4.7.2</axon.version>
 
         <dataprotection-config-api.version>1.0</dataprotection-config-api.version>
         <dataprotection-maven-plugin.version>1.0</dataprotection-maven-plugin.version>
 
-        <vaadin.version>24.0.0</vaadin.version>
-        <lombok.version>1.18.26</lombok.version>
-
-        <jaxb-runtime-version>3.0.0</jaxb-runtime-version>
+        <springdoc-openapi-starter.version>2.0.4</springdoc-openapi-starter.version>
 
         <versions-maven-plugin.version>2.15.0</versions-maven-plugin.version>
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
@@ -67,9 +63,16 @@
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
 
+        <!-- Web dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+            <version>${springdoc-openapi-starter.version}</version>
         </dependency>
 
         <!-- Messaging dependencies -->
@@ -77,12 +80,6 @@
             <!-- The version is provided by the Axon bom. It's needed for subscription queries-->
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
         </dependency>
 
         <!-- Monitoring and Logging -->
