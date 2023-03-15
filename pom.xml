@@ -57,11 +57,21 @@
             <artifactId>axon-spring-boot-starter</artifactId>
         </dependency>
 
-		<!-- Vanilla Spring Boot to start with -->
+        <dependency>
+            <groupId>org.axonframework.extensions.mongo</groupId>
+            <artifactId>axon-mongo-spring-boot-starter</artifactId>
+        </dependency>
+
+		<!-- Vanilla Spring Boot to start with and mongo as database -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
 
         <!-- Web dependencies -->
         <dependency>

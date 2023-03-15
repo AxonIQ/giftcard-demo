@@ -13,39 +13,39 @@ import org.axonframework.eventhandling.Timestamp;
 import org.axonframework.queryhandling.QueryHandler;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static org.springframework.data.domain.Sort.by;
 
 @Profile("query")
 @Service
 @ProcessingGroup("card-summary")
 public class CardSummaryProjection {
 
-    private final Map<String, CardSummary> cardSummaryReadModel;
+    private final CardRepository cardRepository;
     private final QueryUpdateEmitter queryUpdateEmitter;
-    private Instant lastUpdate;
 
     public CardSummaryProjection(
+            CardRepository cardRepository,
             QueryUpdateEmitter queryUpdateEmitter
     ) {
-        this.cardSummaryReadModel = new ConcurrentHashMap<>();
+        this.cardRepository = cardRepository;
         this.queryUpdateEmitter = queryUpdateEmitter;
     }
 
     @EventHandler
     public void on(CardIssuedEvent event, @Timestamp Instant timestamp) {
-        lastUpdate = timestamp;
         /*
          * Update our read model by inserting the new card. This is done so that upcoming regular
          * (non-subscription) queries get correct data.
          */
-        CardSummary summary = CardSummary.issue(event.id(), event.amount(), timestamp);
-        cardSummaryReadModel.put(event.id(), summary);
+        CardEntity entity = CardEntity.issue(event.id(), event.amount(), timestamp);
+        cardRepository.save(entity);
         /*
          * Serve the subscribed queries by emitting an update. This reads as follows:
          * - to all current subscriptions of type CountCardSummariesQuery,
@@ -54,14 +54,14 @@ public class CardSummaryProjection {
          */
         queryUpdateEmitter.emit(CountCardSummariesQuery.class,
                                 query -> true,
-                                new CountCardSummariesResponse(cardSummaryReadModel.size(), lastUpdate));
+                                new CountCardSummariesResponse((int) cardRepository.count(), timestamp));
         /*
          * Serve the subscribed queries by emitting an update. This reads as follows:
          * - to all current subscriptions of type CountCardSummariesQuery,
          * - for any CountCardSummariesQuery, since true is returned by default, and
          * - send a message that the count of queries matching this query has been changed.
          */
-        queryUpdateEmitter.emit(FetchCardSummariesQuery.class, query -> true, summary);
+        queryUpdateEmitter.emit(FetchCardSummariesQuery.class, query -> true, entity.toSummary());
     }
 
     @EventHandler
@@ -70,16 +70,15 @@ public class CardSummaryProjection {
          * Update our read model by updating the existing card. This is done so that upcoming regular
          * (non-subscription) queries get correct data.
          */
-        CardSummary summary = cardSummaryReadModel.computeIfPresent(
-                event.id(), (id, card) -> card.redeem(event.amount(), timestamp)
-        );
+        CardEntity entity = cardRepository.findById(event.id()).orElseThrow().redeem(event.amount(), timestamp);
+        cardRepository.save(entity);
         /*
          * Serve the subscribed queries by emitting an update. This reads as follows:
          * - to all current subscriptions of type FetchCardSummariesQuery
          * - for any FetchCardSummariesQuery, since true is returned by default, and
          * - send a message containing the new state of this gift card summary
          */
-        queryUpdateEmitter.emit(FetchCardSummariesQuery.class, query -> true, summary);
+        queryUpdateEmitter.emit(FetchCardSummariesQuery.class, query -> true, entity.toSummary());
     }
 
     @EventHandler
@@ -88,30 +87,31 @@ public class CardSummaryProjection {
          * Update our read model by updating the existing card. This is done so that upcoming regular
          * (non-subscription) queries get correct data.
          */
-        CardSummary summary = cardSummaryReadModel.computeIfPresent(
-                event.id(), (id, card) -> card.cancel(timestamp)
-        );
+        CardEntity entity = cardRepository.findById(event.id()).orElseThrow().cancel(timestamp);
+        cardRepository.save(entity);
         /*
          * Serve the subscribed queries by emitting an update. This reads as follows:
          * - to all current subscriptions of type FetchCardSummariesQuery
          * - for any FetchCardSummariesQuery, since true is returned by default, and
          * - send a message containing the new state of this gift card summary
          */
-        queryUpdateEmitter.emit(FetchCardSummariesQuery.class, query -> true, summary);
+        queryUpdateEmitter.emit(FetchCardSummariesQuery.class, query -> true, entity.toSummary());
     }
 
     @QueryHandler
     public List<CardSummary> handle(FetchCardSummariesQuery query) {
-        return cardSummaryReadModel.values()
-                                   .stream()
-                                   .sorted(Comparator.comparing(CardSummary::lastUpdated))
-                                   .limit(query.limit())
-                                   .toList();
+        PageRequest pageRequest = PageRequest.of(0, query.limit(), by("lastUpdated"));
+        return cardRepository.findAll(pageRequest)
+                .map(CardEntity::toSummary)
+                .toList();
     }
 
     @SuppressWarnings("unused")
     @QueryHandler
     public CountCardSummariesResponse handle(CountCardSummariesQuery query) {
-        return new CountCardSummariesResponse(cardSummaryReadModel.size(), lastUpdate);
+        AtomicReference<Instant> time = new AtomicReference<>(Instant.MIN);
+        PageRequest pageRequest = PageRequest.of(0, 1, by("lastUpdated"));
+        cardRepository.findAll(pageRequest).stream().findFirst().ifPresent(c -> time.set(c.lastUpdated()));
+        return new CountCardSummariesResponse((int) cardRepository.count(), time.get());
     }
 }
