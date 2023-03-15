@@ -19,13 +19,14 @@ import static org.mockito.Mockito.*;
 
 class CardSummaryProjectionTest {
 
+    private final CardRepository cardRepository = mock(CardRepository.class);
     private final QueryUpdateEmitter updateEmitter = mock(QueryUpdateEmitter.class);
 
     private CardSummaryProjection testSubject;
 
     @BeforeEach
     void setUp() {
-        testSubject = new CardSummaryProjection(updateEmitter);
+        testSubject = new CardSummaryProjection(cardRepository, updateEmitter);
     }
 
     @Test

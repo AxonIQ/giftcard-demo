@@ -1,15 +1,12 @@
 version: '3.3'
 services:
-  axonserver:
-    image: axoniq/axonserver:latest
-    hostname: axonserver
-    environment:
-      - SPRING_SERVLET_MULTIPART_MAX-FILE-SIZE=35MB
-      - SPRING_SERVLET_MULTIPART_MAX-REQUEST-SIZE=35MB
-      - AXONIQ_AXONSERVER_DEVMODE_ENABLED=TRUE
+  mongodb:
+    image: bitnami/mongodb:6.0.4
     ports:
-      - '8024:8024'
-      - '8124:8124'
+      - "27017:27017"
+    environment:
+      - MONGODB_REPLICA_SET_MODE=primary
+      - ALLOW_EMPTY_PASSWORD=yes
     networks:
       - axon-server-plugin-data-protection
 
