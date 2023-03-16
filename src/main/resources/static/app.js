@@ -79,7 +79,6 @@ async function handleResult(result) {
     if (result["isSuccess"] === true) {
         notification.classList.add("is-success")
         notificationText.innerHTML = "Success"
-        setTimeout(hideNotification, 5000)
     } else {
         notification.classList.add("is-danger")
         notificationText.innerHTML = result["error"]
