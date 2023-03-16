@@ -14,12 +14,14 @@ import org.axonframework.queryhandling.QueryHandler;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.google.common.collect.Lists.reverse;
 import static org.springframework.data.domain.Sort.by;
 
 @Profile("query")
@@ -100,17 +102,17 @@ public class CardSummaryProjection {
 
     @QueryHandler
     public List<CardSummary> handle(FetchCardSummariesQuery query) {
-        PageRequest pageRequest = PageRequest.of(0, query.limit(), by("lastUpdated"));
-        return cardRepository.findAll(pageRequest)
+        PageRequest pageRequest = PageRequest.of(0, query.limit(), by(Sort.Direction.DESC,"lastUpdated"));
+        return reverse(cardRepository.findAll(pageRequest)
                 .map(CardEntity::toSummary)
-                .toList();
+                .toList());
     }
 
     @SuppressWarnings("unused")
     @QueryHandler
     public CountCardSummariesResponse handle(CountCardSummariesQuery query) {
         AtomicReference<Instant> time = new AtomicReference<>(Instant.MIN);
-        PageRequest pageRequest = PageRequest.of(0, 1, by("lastUpdated"));
+        PageRequest pageRequest = PageRequest.of(0, 1, by(Sort.Direction.DESC, "lastUpdated"));
         cardRepository.findAll(pageRequest).stream().findFirst().ifPresent(c -> time.set(c.lastUpdated()));
         return new CountCardSummariesResponse((int) cardRepository.count(), time.get());
     }
