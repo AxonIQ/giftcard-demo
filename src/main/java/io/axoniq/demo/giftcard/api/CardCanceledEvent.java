@@ -1,4 +1,4 @@
-package io.axoniq.demo.giftcard.api.event;
+package io.axoniq.demo.giftcard.api;
 
 public record CardCanceledEvent(
         String id

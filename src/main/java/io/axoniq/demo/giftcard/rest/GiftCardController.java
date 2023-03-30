@@ -1,11 +1,11 @@
 package io.axoniq.demo.giftcard.rest;
 
-import io.axoniq.demo.giftcard.api.command.IssueCardCommand;
-import io.axoniq.demo.giftcard.api.command.RedeemCardCommand;
-import io.axoniq.demo.giftcard.api.query.CardSummary;
-import io.axoniq.demo.giftcard.api.query.CountCardSummariesQuery;
-import io.axoniq.demo.giftcard.api.query.CountCardSummariesResponse;
-import io.axoniq.demo.giftcard.api.query.FetchCardSummariesQuery;
+import io.axoniq.demo.giftcard.api.IssueCardCommand;
+import io.axoniq.demo.giftcard.api.RedeemCardCommand;
+import io.axoniq.demo.giftcard.api.CardSummary;
+import io.axoniq.demo.giftcard.api.CountCardSummariesQuery;
+import io.axoniq.demo.giftcard.api.CountCardSummariesResponse;
+import io.axoniq.demo.giftcard.api.FetchCardSummariesQuery;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -56,7 +56,7 @@ public class GiftCardController {
     ) {
         var command = new IssueCardCommand(id, amount);
         return Mono.fromFuture(commandGateway.send(command))
-                   .map(e -> Result.ok())
+                   .then(Mono.just(Result.ok()))
                    .onErrorResume(e -> Mono.just(Result.Error(id, e.getMessage())))
                    .timeout(Duration.ofSeconds(5L));
     }
