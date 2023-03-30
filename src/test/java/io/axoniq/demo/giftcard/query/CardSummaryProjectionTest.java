@@ -1,11 +1,11 @@
 package io.axoniq.demo.giftcard.query;
 
-import io.axoniq.demo.giftcard.api.event.CardIssuedEvent;
-import io.axoniq.demo.giftcard.api.event.CardRedeemedEvent;
-import io.axoniq.demo.giftcard.api.query.CardSummary;
-import io.axoniq.demo.giftcard.api.query.CountCardSummariesQuery;
-import io.axoniq.demo.giftcard.api.query.CountCardSummariesResponse;
-import io.axoniq.demo.giftcard.api.query.FetchCardSummariesQuery;
+import io.axoniq.demo.giftcard.api.CardIssuedEvent;
+import io.axoniq.demo.giftcard.api.CardRedeemedEvent;
+import io.axoniq.demo.giftcard.api.CardSummary;
+import io.axoniq.demo.giftcard.api.CountCardSummariesQuery;
+import io.axoniq.demo.giftcard.api.CountCardSummariesResponse;
+import io.axoniq.demo.giftcard.api.FetchCardSummariesQuery;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
 import org.junit.jupiter.api.*;
 

@@ -1,4 +1,4 @@
-package io.axoniq.demo.giftcard.api.query;
+package io.axoniq.demo.giftcard.api;
 
 import java.time.Instant;
 

@@ -1,4 +1,4 @@
-package io.axoniq.demo.giftcard.api.event;
+package io.axoniq.demo.giftcard.api;
 
 import io.axoniq.plugin.data.protection.annotation.SensitiveData;
 import io.axoniq.plugin.data.protection.annotation.SensitiveDataHolder;
