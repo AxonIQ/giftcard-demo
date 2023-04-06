@@ -26,7 +26,7 @@ class CardSummaryProjectionTest {
 
     @BeforeEach
     void setUp() {
-        testSubject = new CardSummaryProjection(cardRepository, updateEmitter);
+        testSubject = new CardSummaryProjection(cardRepository, null, updateEmitter);
     }
 
     @Test

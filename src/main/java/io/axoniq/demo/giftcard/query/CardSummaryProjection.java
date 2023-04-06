@@ -30,13 +30,16 @@ import static org.springframework.data.domain.Sort.by;
 public class CardSummaryProjection {
 
     private final CardRepository cardRepository;
+    private final ReactiveCardRepository reactiveCardRepository;
     private final QueryUpdateEmitter queryUpdateEmitter;
 
     public CardSummaryProjection(
             CardRepository cardRepository,
+            ReactiveCardRepository reactiveCardRepository,
             QueryUpdateEmitter queryUpdateEmitter
     ) {
         this.cardRepository = cardRepository;
+        this.reactiveCardRepository = reactiveCardRepository;
         this.queryUpdateEmitter = queryUpdateEmitter;
     }
 
@@ -48,6 +51,8 @@ public class CardSummaryProjection {
          */
         CardEntity entity = CardEntity.issue(event.id(), event.amount(), timestamp);
         cardRepository.save(entity);
+        ReactiveCardEntity reactiveCardEntity = ReactiveCardEntity.issue(event.id(), event.amount(), timestamp);
+        reactiveCardRepository.save(reactiveCardEntity).block();
         /*
          * Serve the subscribed queries by emitting an update. This reads as follows:
          * - to all current subscriptions of type CountCardSummariesQuery,
