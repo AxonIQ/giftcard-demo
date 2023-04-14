@@ -5,9 +5,19 @@
 
 == Command definition
 
-[source,kotlin]
+[source,java]
 ----
-include::example$src/main/java/io/axoniq/demo/giftcard/api/api.kt[tag=commands]
+include::example$src/main/java/io/axoniq/demo/giftcard/api/IssueCardCommand.java[tag=IssueCardCommand]
+----
+
+[source,java]
+----
+include::example$src/main/java/io/axoniq/demo/giftcard/api/RedeemCardCommand.java[tag=RedeemCardCommand]
+----
+
+[source,java]
+----
+include::example$src/main/java/io/axoniq/demo/giftcard/api/CancelCardCommand.java[tag=CancelCardCommand]
 ----
 
 == Command handlers

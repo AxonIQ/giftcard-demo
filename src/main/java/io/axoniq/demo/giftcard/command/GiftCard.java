@@ -22,6 +22,7 @@ public class GiftCard {
     private String giftCardId;
     private int remainingValue;
 
+    // Tag this handler to use it as code sample in the documentation
     // tag::IssueCardCommandHandler[]
     @CommandHandler
     public GiftCard(IssueCardCommand command) {
@@ -32,6 +33,7 @@ public class GiftCard {
     }
     // end::IssueCardCommandHandler[]
 
+    // Tag this handler to use it as code sample in the documentation
     // tag::RedeemCardCommandHandler[]
     @CommandHandler
     public void handle(RedeemCardCommand command) {
