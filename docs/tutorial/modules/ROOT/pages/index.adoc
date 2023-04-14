@@ -1,0 +1,7 @@
+= Introduction
+:navtitle: Introduction
+:reftext: Building a Giftcard Application
+
+Building a new application can be a daunting task. This tutorial walks you trough the various phases of development, explains the capabilities of Axon Framework and provides useful tips and tricks along the way.
+
+The result is a simple application you deploy in "production". Then the tutorial teaches you how to evolve the application, make changes and deploy those in different scenarios.

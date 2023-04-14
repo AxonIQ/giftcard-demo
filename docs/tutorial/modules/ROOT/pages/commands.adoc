@@ -1,0 +1,39 @@
+= Commands
+:page-needs-improvement: content
+:page-needs-content: This page is a placeholder. Add meaningful content.
+
+
+== Command definition
+
+[source,java]
+----
+include::example$src/main/java/io/axoniq/demo/giftcard/api/IssueCardCommand.java[tag=IssueCardCommand]
+----
+
+[source,java]
+----
+include::example$src/main/java/io/axoniq/demo/giftcard/api/RedeemCardCommand.java[tag=RedeemCardCommand]
+----
+
+[source,java]
+----
+include::example$src/main/java/io/axoniq/demo/giftcard/api/CancelCardCommand.java[tag=CancelCardCommand]
+----
+
+== Command handlers
+
+=== Issue card
+
+
+[source,java]
+----
+include::example$src/main/java/io/axoniq/demo/giftcard/command/GiftCard.java[tag=IssueCardCommandHandler]
+----
+
+=== Redeem card
+
+
+[source,java]
+----
+include::example$src/main/java/io/axoniq/demo/giftcard/command/GiftCard.java[tag=RedeemCardCommandHandler]
+----

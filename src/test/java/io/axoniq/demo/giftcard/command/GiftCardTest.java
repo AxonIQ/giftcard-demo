@@ -1,9 +1,9 @@
 package io.axoniq.demo.giftcard.command;
 
-import io.axoniq.demo.giftcard.api.CardIssuedEvent;
-import io.axoniq.demo.giftcard.api.CardRedeemedEvent;
-import io.axoniq.demo.giftcard.api.IssueCardCommand;
-import io.axoniq.demo.giftcard.api.RedeemCardCommand;
+import io.axoniq.demo.giftcard.api.event.CardIssuedEvent;
+import io.axoniq.demo.giftcard.api.event.CardRedeemedEvent;
+import io.axoniq.demo.giftcard.api.command.IssueCardCommand;
+import io.axoniq.demo.giftcard.api.command.RedeemCardCommand;
 import org.axonframework.test.aggregate.AggregateTestFixture;
 import org.axonframework.test.aggregate.FixtureConfiguration;
 import org.junit.jupiter.api.*;

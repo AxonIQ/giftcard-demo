@@ -1,0 +1,13 @@
+name: giftcard
+title: Building a Giftcard Application
+version: true
+
+asciidoc:
+  attributes:
+    component_description: Getting started with designing, building, and deploying Axon applications
+    type: tutorial
+    group: beginner
+
+
+nav:
+  - modules/ROOT/nav.adoc

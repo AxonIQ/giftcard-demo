@@ -1,11 +1,11 @@
 package io.axoniq.demo.giftcard.command;
 
-import io.axoniq.demo.giftcard.api.CancelCardCommand;
-import io.axoniq.demo.giftcard.api.CardCanceledEvent;
-import io.axoniq.demo.giftcard.api.IssueCardCommand;
-import io.axoniq.demo.giftcard.api.CardIssuedEvent;
-import io.axoniq.demo.giftcard.api.RedeemCardCommand;
-import io.axoniq.demo.giftcard.api.CardRedeemedEvent;
+import io.axoniq.demo.giftcard.api.command.CancelCardCommand;
+import io.axoniq.demo.giftcard.api.event.CardCanceledEvent;
+import io.axoniq.demo.giftcard.api.command.IssueCardCommand;
+import io.axoniq.demo.giftcard.api.event.CardIssuedEvent;
+import io.axoniq.demo.giftcard.api.command.RedeemCardCommand;
+import io.axoniq.demo.giftcard.api.event.CardRedeemedEvent;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
@@ -22,6 +22,8 @@ public class GiftCard {
     private String giftCardId;
     private int remainingValue;
 
+    // Tag this handler to use it as code sample in the documentation
+    // tag::IssueCardCommandHandler[]
     @CommandHandler
     public GiftCard(IssueCardCommand command) {
         if (command.amount() <= 0) {
@@ -29,7 +31,10 @@ public class GiftCard {
         }
         apply(new CardIssuedEvent(command.id(), command.amount()));
     }
+    // end::IssueCardCommandHandler[]
 
+    // Tag this handler to use it as code sample in the documentation
+    // tag::RedeemCardCommandHandler[]
     @CommandHandler
     public void handle(RedeemCardCommand command) {
         if (command.amount() <= 0) {
@@ -40,6 +45,7 @@ public class GiftCard {
         }
         apply(new CardRedeemedEvent(giftCardId, command.amount()));
     }
+    // end::RedeemCardCommandHandler[]
 
     @SuppressWarnings("unused")
     @CommandHandler
