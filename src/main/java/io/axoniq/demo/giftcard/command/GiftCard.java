@@ -1,11 +1,11 @@
 package io.axoniq.demo.giftcard.command;
 
-import io.axoniq.demo.giftcard.api.command.CancelCardCommand;
-import io.axoniq.demo.giftcard.api.event.CardCanceledEvent;
-import io.axoniq.demo.giftcard.api.command.IssueCardCommand;
-import io.axoniq.demo.giftcard.api.event.CardIssuedEvent;
-import io.axoniq.demo.giftcard.api.command.RedeemCardCommand;
-import io.axoniq.demo.giftcard.api.event.CardRedeemedEvent;
+import io.axoniq.demo.giftcard.api.CancelCardCommand;
+import io.axoniq.demo.giftcard.api.CardCanceledEvent;
+import io.axoniq.demo.giftcard.api.CardIssuedEvent;
+import io.axoniq.demo.giftcard.api.CardRedeemedEvent;
+import io.axoniq.demo.giftcard.api.IssueCardCommand;
+import io.axoniq.demo.giftcard.api.RedeemCardCommand;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
