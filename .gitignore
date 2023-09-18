@@ -23,3 +23,6 @@ dist/
 nbdist/
 .nb-gradle/
 *.jar
+docs/_playbook/vale
+.DS_Store
+.java-version
