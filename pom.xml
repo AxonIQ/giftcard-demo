@@ -32,7 +32,7 @@
 
         <springdoc-openapi-starter.version>2.2.0</springdoc-openapi-starter.version>
 
-        <versions-maven-plugin.version>2.16.0</versions-maven-plugin.version>
+        <versions-maven-plugin.version>2.16.1</versions-maven-plugin.version>
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
 
         <junit.jupiter.version>5.10.0</junit.jupiter.version>
