@@ -1,51 +1,83 @@
 package io.axoniq.demo.giftcard.query;
 
-import io.axoniq.demo.giftcard.api.CardCanceledEvent;
-import io.axoniq.demo.giftcard.api.CardIssuedEvent;
-import io.axoniq.demo.giftcard.api.CardRedeemedEvent;
-import io.axoniq.demo.giftcard.api.CardSummary;
-import io.axoniq.demo.giftcard.api.CountCardSummariesQuery;
-import io.axoniq.demo.giftcard.api.CountCardSummariesResponse;
-import io.axoniq.demo.giftcard.api.FetchCardSummariesQuery;
+import io.axoniq.demo.giftcard.api.*;
 import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.eventhandling.Timestamp;
 import org.axonframework.queryhandling.QueryHandler;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.EmptySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Profile("query")
 @Service
 @ProcessingGroup("card-summary")
 public class CardSummaryProjection {
 
-    private final Map<String, CardSummary> cardSummaryReadModel;
-    private final QueryUpdateEmitter queryUpdateEmitter;
-    private Instant lastUpdate;
+    private static final String INSERT = """
+            INSERT INTO cardsummary (id, initialValue, remainingValue, issued, lastUpdated)
+            VALUES (:id, :initialValue, :remainingValue, :issued, :lastUpdated)
+            """;
+    private static final String UPDATE = """
+            UPDATE cardsummary
+            SET initialValue = :initialValue,
+                remainingValue = :remainingValue,
+                issued = :issued,
+                lastUpdated = :lastUpdated
+            WHERE id = :id
+            """;
 
-    public CardSummaryProjection(
-            QueryUpdateEmitter queryUpdateEmitter
-    ) {
-        this.cardSummaryReadModel = new ConcurrentHashMap<>();
+    private static final String QUERY_BY_ID = """
+            SELECT id, initialValue, remainingValue, issued, lastUpdated
+            FROM cardsummary
+            WHERE id = :id
+            """;
+
+    private static final String QUERY_ALL = """
+            SELECT id, initialValue, remainingvalue, issued, lastupdated
+            FROM cardsummary
+            ORDER BY lastupdated
+            LIMIT :limit
+            """;
+
+    private static final String COUNT = """
+            SELECT count(*) AS size
+            FROM cardsummary
+            """;
+
+    private static final String ISSUED = """
+            SELECT MAX(issued) AS issued
+            FROM cardsummary
+            """;
+
+    @Autowired
+    private NamedParameterJdbcTemplate jdbcTemplate;
+
+    private final QueryUpdateEmitter queryUpdateEmitter;
+
+    public CardSummaryProjection(QueryUpdateEmitter queryUpdateEmitter) {
         this.queryUpdateEmitter = queryUpdateEmitter;
     }
 
     @EventHandler
     public void on(CardIssuedEvent event, @Timestamp Instant timestamp) {
-        lastUpdate = timestamp;
         /*
          * Update our read model by inserting the new card. This is done so that upcoming regular
          * (non-subscription) queries get correct data.
          */
         CardSummary summary = CardSummary.issue(event.id(), event.amount(), timestamp);
-        cardSummaryReadModel.put(event.id(), summary);
+        jdbcTemplate.update(INSERT, parameterSource(summary));
+
         /*
          * Serve the subscribed queries by emitting an update. This reads as follows:
          * - to all current subscriptions of type CountCardSummariesQuery,
@@ -53,8 +85,8 @@ public class CardSummaryProjection {
          * - send a message that the count of queries matching this query has been changed.
          */
         queryUpdateEmitter.emit(CountCardSummariesQuery.class,
-                                query -> true,
-                                new CountCardSummariesResponse(cardSummaryReadModel.size(), lastUpdate));
+                query -> true,
+                new CountCardSummariesResponse(cardCount(), lastUpdate()));
         /*
          * Serve the subscribed queries by emitting an update. This reads as follows:
          * - to all current subscriptions of type CountCardSummariesQuery,
@@ -70,9 +102,10 @@ public class CardSummaryProjection {
          * Update our read model by updating the existing card. This is done so that upcoming regular
          * (non-subscription) queries get correct data.
          */
-        CardSummary summary = cardSummaryReadModel.computeIfPresent(
-                event.id(), (id, card) -> card.redeem(event.amount(), timestamp)
-        );
+        CardSummary summary = jdbcTemplate.queryForObject(QUERY_BY_ID,
+                new MapSqlParameterSource("id", event.id()),
+                cardSummaryRowMapper()).redeem(event.amount(), timestamp);
+        jdbcTemplate.update(UPDATE, parameterSource(summary));
         /*
          * Serve the subscribed queries by emitting an update. This reads as follows:
          * - to all current subscriptions of type FetchCardSummariesQuery
@@ -88,9 +121,10 @@ public class CardSummaryProjection {
          * Update our read model by updating the existing card. This is done so that upcoming regular
          * (non-subscription) queries get correct data.
          */
-        CardSummary summary = cardSummaryReadModel.computeIfPresent(
-                event.id(), (id, card) -> card.cancel(timestamp)
-        );
+        CardSummary summary = jdbcTemplate.queryForObject(QUERY_BY_ID,
+                new MapSqlParameterSource("id", event.id()),
+                cardSummaryRowMapper()).cancel(timestamp);
+        jdbcTemplate.update(UPDATE, parameterSource(summary));
         /*
          * Serve the subscribed queries by emitting an update. This reads as follows:
          * - to all current subscriptions of type FetchCardSummariesQuery
@@ -102,16 +136,44 @@ public class CardSummaryProjection {
 
     @QueryHandler
     public List<CardSummary> handle(FetchCardSummariesQuery query) {
-        return cardSummaryReadModel.values()
-                                   .stream()
-                                   .sorted(Comparator.comparing(CardSummary::lastUpdated))
-                                   .limit(query.limit())
-                                   .toList();
+        return jdbcTemplate.query(QUERY_ALL, new MapSqlParameterSource("limit", query.limit()), cardSummaryRowMapper());
     }
 
     @SuppressWarnings("unused")
     @QueryHandler
     public CountCardSummariesResponse handle(CountCardSummariesQuery query) {
-        return new CountCardSummariesResponse(cardSummaryReadModel.size(), lastUpdate);
+        return new CountCardSummariesResponse(cardCount(), lastUpdate());
+    }
+
+    @NotNull
+    private static MapSqlParameterSource parameterSource(CardSummary summary) {
+        MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("id", summary.id());
+        parameterSource.addValue("initialValue", summary.initialValue());
+        parameterSource.addValue("remainingValue", summary.remainingValue());
+        parameterSource.addValue("issued", java.sql.Timestamp.from(summary.issued()));
+        parameterSource.addValue("lastUpdated", java.sql.Timestamp.from(summary.lastUpdated()));
+        return parameterSource;
+    }
+
+    @NotNull
+    private static RowMapper<CardSummary> cardSummaryRowMapper() {
+        return (rs, rowNum) -> new CardSummary(rs.getString("id"),
+                rs.getInt("initialValue"),
+                rs.getInt("remainingValue"),
+                rs.getTimestamp("issued").toInstant(),
+                rs.getTimestamp("lastUpdated").toInstant());
+    }
+
+    @Nullable
+    private Instant lastUpdate() {
+        return jdbcTemplate.queryForObject(ISSUED, EmptySqlParameterSource.INSTANCE,
+                (rs, rowNum) -> rs.getTimestamp("issued").toInstant());
+    }
+
+    private int cardCount() {
+        return jdbcTemplate.queryForObject(COUNT,
+                new EmptySqlParameterSource(),
+                (rs, rowNum) -> rs.getInt("size"));
     }
 }
