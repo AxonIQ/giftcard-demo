@@ -1,32 +1,62 @@
 version: 2
+
 updates:
-- package-ecosystem: github-actions
-  directory: "/"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 5
-  labels:
-    - "Type: Dependency Upgrade"
-    - "Priority 1: Must"
-    - "Status: In Progress"
-  milestone: 4
-  reviewers:
-    - "gklijs"
-    - "Morlack"
-    - "saratry"
-    - "smcvb" # Main
-- package-ecosystem: maven
-  directory: "/"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 5
-  labels:
-    - "Type: Dependency Upgrade"
-    - "Priority 1: Must"
-    - "Status: In Progress"
-  milestone: 4
-  reviewers:
-    - "gklijs"
-    - "Morlack"
-    - "saratry"
-    - "smcvb" # Main
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: "sunday"
+    open-pull-requests-limit: 5
+    labels:
+      - "Type: Dependency Upgrade"
+      - "Priority 1: Must"
+    milestone: 6
+    reviewers:
+      - "smcvb"
+      - "CodeDrivenMitch"
+    groups:
+      github-dependencies:
+        update-types:
+          - "patch"
+          - "minor"
+          - "major"
+
+  - package-ecosystem: maven
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: "sunday"
+    open-pull-requests-limit: 5
+    labels:
+      - "Type: Dependency Upgrade"
+      - "Priority 1: Must"
+    milestone: 6
+    reviewers:
+      - "smcvb"
+      - "CodeDrivenMitch"
+    groups:
+      maven-dependencies:
+        update-types:
+          - "patch"
+          - "minor"
+          - "major"
+
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: "sunday"
+    open-pull-requests-limit: 5
+    labels:
+      - "Type: Dependency Upgrade"
+      - "Priority 1: Must"
+    milestone: 6
+    reviewers:
+      - "smcvb"
+      - "CodeDrivenMitch"
+    groups:
+      maven-dependencies:
+        update-types:
+          - "patch"
+          - "minor"
+          - "major"
