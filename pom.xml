@@ -25,7 +25,7 @@
 
         <java.version>17</java.version>
 
-        <axon.version>4.9.4</axon.version>
+        <axon.version>4.10.2</axon.version>
 
         <dataprotection-config-api.version>1.0</dataprotection-config-api.version>
         <dataprotection-maven-plugin.version>1.0</dataprotection-maven-plugin.version>
