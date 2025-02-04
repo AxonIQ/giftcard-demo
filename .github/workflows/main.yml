@@ -36,6 +36,5 @@ jobs:
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
 
-      - name: Build
-        run: |
-          ./mvnw -B -U clean verify
+      - name: Build and Verify
+        run: ./mvnw -B -U -Dstyle.color=always clean verify
